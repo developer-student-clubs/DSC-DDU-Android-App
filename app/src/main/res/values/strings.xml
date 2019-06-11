@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">DSC DDU</string>
+    <string name="forgetPass">Forget Password</string>
+    <string name="createAccString">Didn\'t have Account, Create New</string>
+    <string name="loginScreen_email">Email Address</string>
+    <string name="loginScreen_password">Password</string>
+    <string name="Btn_name_Signup">SIGN UP</string>
+    <string name="SignupScreen_name_hint">Name</string>
+    <string name="SignupScreen_email_hint">Email Address</string>
+    <string name="SignupScreen_pass_hint">Password</string>
+    <string name="SignupScreen_cpass_hint">Confirm Password</string>
+    <string name="welcome_text">Welcome to DSC DDU</string>
+    <string name="verify_email_desc">Email is already sent to you. Please Verify it.</string>
+</resources>
