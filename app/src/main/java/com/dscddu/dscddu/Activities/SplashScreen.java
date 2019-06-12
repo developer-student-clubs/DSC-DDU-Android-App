@@ -19,13 +19,11 @@ public class SplashScreen extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_splash_screen);
-//        getSupportActionBar().hide();
-
-
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
+        //In Actual Splash Screen no need to set Splash Screen
+//        setContentView(R.layout.activity_splash_screen);
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
 
 
                 Intent i = new Intent(SplashScreen.this, OnBoardingActivity.class);
@@ -33,7 +31,7 @@ public class SplashScreen extends AppCompatActivity {
 //                        ActivityOptions.makeSceneTransitionAnimation(SplashScreen.this).toBundle());
                 finish();
 
-            }
-        },1500);
+//            }
+//        },1500);
     }
 }

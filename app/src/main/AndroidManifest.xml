@@ -9,12 +9,18 @@
         android:roundIcon="@drawable/dsc_new"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Activities.ForgetPasswordActivity" android:theme="@style/PlainTheme"
-            android:parentActivityName=".Activities.LoginActivity"></activity>
+        <activity
+            android:name=".Activities.HomeActivity"
+            android:label="@string/title_activity_home"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
+            android:name=".Activities.ForgetPasswordActivity"
+            android:parentActivityName=".Activities.LoginActivity"
+            android:theme="@style/PlainTheme" />
         <activity
             android:name=".Activities.LoginActivity"
             android:parentActivityName=".Activities.SignUpActivity"
-            android:theme="@style/PlainTheme"></activity>
+            android:theme="@style/PlainTheme" />
         <activity
             android:name=".Activities.SignUpActivity"
             android:theme="@style/PlainTheme" />
@@ -23,7 +29,7 @@
             android:theme="@style/BlueTheme" />
         <activity
             android:name=".Activities.SplashScreen"
-            android:theme="@style/BlueTheme">
+            android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

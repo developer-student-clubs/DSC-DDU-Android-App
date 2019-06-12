@@ -77,7 +77,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void skipActivity() {
-//        Intent intent = new Intent(getApplicationContext(),)
+        Intent intent = new Intent(getApplicationContext(),HomeActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     @Override
