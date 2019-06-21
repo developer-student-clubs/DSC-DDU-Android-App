@@ -28,4 +28,11 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="event_branch">Branch:</string>
+    <string name="event_venue">Venue:</string>
+    <string name="event_time">Timings:</string>
+    <string name="event_sem">Semester:</string>
+    <string name="event_extra">Extra</string>
+    <string name="event_what_to_bring">What to Bring:</string>
+    <string name="event_date">Date:</string>
 </resources>

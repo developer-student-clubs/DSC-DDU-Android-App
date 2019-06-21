@@ -6,124 +6,74 @@
     android:layout_height="match_parent"
     tools:context=".Activities.SignUpActivity">
 
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/input_layout_name_Signup"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
 
-        <EditText
-            android:id="@+id/name_EditText_signup"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/SignupScreen_name_hint"
-            android:inputType="text"
-            android:textColor="@color/colorPrimary" />
-    </android.support.design.widget.TextInputLayout>
 
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/input_layout_email_Signup"
-        android:layout_width="match_parent"
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline3"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.489"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/input_layout_name_Signup"
-        tools:ignore="DuplicateIds">
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/dsc_new" />
 
-        <EditText
-            android:id="@+id/email_EditText_signup"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/SignupScreen_email_hint"
-            android:inputType="textEmailAddress"
-            android:textColor="@color/colorPrimary" />
-    </android.support.design.widget.TextInputLayout>
-
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/input_layout_pass_Signup"
-        android:layout_width="match_parent"
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline3"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/input_layout_email_Signup">
-
-        <EditText
-            android:id="@+id/pass_EditText_signup"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/SignupScreen_pass_hint"
-            android:inputType="textPassword"
-            android:textColor="@color/colorPrimary" />
-    </android.support.design.widget.TextInputLayout>
-
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/input_layout_cpass_Signup"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/input_layout_pass_Signup">
-
-        <EditText
-            android:id="@+id/cpass_EditText_signup"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/SignupScreen_cpass_hint"
-            android:inputType="textPassword"
-            android:textColor="@color/colorPrimary" />
-    </android.support.design.widget.TextInputLayout>
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.57" />
 
     <Button
-        android:id="@+id/signupBtn"
-        android:layout_width="0dp"
+        android:id="@+id/signInButton"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:background="@drawable/next_btn_layout"
-        android:text="@string/Btn_name_Signup"
-        android:textColor="@android:color/white"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/input_layout_cpass_Signup" />
-
-    <com.google.android.gms.common.SignInButton
-        android:id="@+id/signInButton"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
         android:layout_marginBottom="8dp"
-        android:textColor="@android:color/white"
-        app:layout_constraintBottom_toTopOf="@+id/LoginBtn"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/signupBtn" />
-
-    <Button
-        android:id="@+id/LoginBtn"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="@color/login_background"
-        android:text="LOGIN"
-        android:textColor="@color/colorPrimary"
+        android:background="@drawable/common_google_signin_btn_text_dark_normal_background"
+        android:drawableLeft="@drawable/google_icon"
+        android:fontFamily="@font/open_sans"
+        android:padding="14dp"
+        android:text="  Sign In With Google"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@color/backgroundWhite"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView4"
+        app:layout_constraintVertical_bias="0.25" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:fontFamily="@font/open_sans"
+        android:text="Welcome To DSC-DDU"
+        android:textColor="@color/backgroundBlack"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:fontFamily="@font/open_sans"
+        android:text="Get Started With"
+        android:textColor="@color/backgroundBlack"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline3" />
 
 </android.support.constraint.ConstraintLayout>

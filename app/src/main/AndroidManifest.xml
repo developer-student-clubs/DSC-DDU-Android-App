@@ -9,26 +9,30 @@
         android:roundIcon="@drawable/dsc_new"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".Activities.EventDetailsActivity"
+            android:theme="@style/PlainTheme" android:parentActivityName=".Activities.HomeActivity"
+            android:screenOrientation="portrait"
+            ></activity>
+        <activity
+            android:name=".Activities.UserDetailsActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/PlainTheme" />
         <activity
             android:name=".Activities.HomeActivity"
             android:label="@string/title_activity_home"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
-        <activity
-            android:name=".Activities.ForgetPasswordActivity"
-            android:parentActivityName=".Activities.LoginActivity"
-            android:theme="@style/PlainTheme" />
-        <activity
-            android:name=".Activities.LoginActivity"
-            android:parentActivityName=".Activities.SignUpActivity"
-            android:theme="@style/PlainTheme" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Activities.SignUpActivity"
-            android:theme="@style/PlainTheme" />
+            android:screenOrientation="portrait"
+            android:theme="@style/BlueTheme" />
         <activity
             android:name=".Activities.OnBoardingActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/BlueTheme" />
         <activity
             android:name=".Activities.SplashScreen"
+            android:screenOrientation="portrait"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -36,9 +40,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".Activities.MainActivity"
-            android:theme="@style/PlainTheme" />
+
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
     </application>
 
 </manifest>

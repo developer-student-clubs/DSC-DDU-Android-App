@@ -1,9 +1,12 @@
 package com.dscddu.dscddu.Activities;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentManager;
 import android.view.View;
 import android.support.v4.view.GravityCompat;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -22,15 +25,20 @@ import com.bumptech.glide.Glide;
 import com.dscddu.dscddu.Fragments.HomeFragment;
 import com.dscddu.dscddu.Fragments.ProfileFragment;
 import com.dscddu.dscddu.R;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GetTokenResult;
 
 public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-    FirebaseAuth mAuth;
-    FirebaseUser user;
+    private FirebaseAuth mAuth;
+    private FirebaseUser user;
+    private FragmentManager fragmentManager;
+    private SharedPreferences sharedPreferences;
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
@@ -40,7 +48,10 @@ public class HomeActivity extends AppCompatActivity
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        sharedPreferences = getSharedPreferences("data", Context.MODE_PRIVATE);
+        fragmentManager = getSupportFragmentManager();
         //FOR FLOATING BUTTON
+
 //        FloatingActionButton fab = findViewById(R.id.fab);
 //        fab.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -49,6 +60,9 @@ public class HomeActivity extends AppCompatActivity
 //                        .setAction("Action", null).show();
 //            }
 //        });
+        getSupportActionBar().setTitle("Home");
+        fragmentManager.beginTransaction().replace(R.id.layout_container,
+                new HomeFragment()).commit();
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -57,6 +71,24 @@ public class HomeActivity extends AppCompatActivity
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
         updateNavHeader();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+//        user.getIdToken(false).addOnSuccessListener(new OnSuccessListener<GetTokenResult>() {
+//            @Override
+//            public void onSuccess(GetTokenResult result) {
+//                boolean isAdmin = (boolean) result.getClaims().get("admin");
+//                if (isAdmin) {
+//                    // Show admin UI.
+////                    showAdminUI();
+//                } else {
+//                    // Show regular user UI.
+////                    showRegularUI();
+//                }
+//            }
+//        });
     }
 
     @Override
@@ -100,21 +132,24 @@ public class HomeActivity extends AppCompatActivity
 
         if (id == R.id.nav_home) {
             getSupportActionBar().setTitle("Home");
-            getSupportFragmentManager().beginTransaction().replace(R.id.layout_container,
+            fragmentManager.beginTransaction().replace(R.id.layout_container,
                     new HomeFragment()).commit();
 
         } else if (id == R.id.nav_profile) {
             getSupportActionBar().setTitle("Profile");
-            getSupportFragmentManager().beginTransaction().replace(R.id.layout_container,
+            fragmentManager.beginTransaction().replace(R.id.layout_container,
                     new ProfileFragment()).commit();
 
         } else if (id == R.id.nav_settings) {
             getSupportActionBar().setTitle("Settings");
-            getSupportFragmentManager().beginTransaction().replace(R.id.layout_container,
+            fragmentManager.beginTransaction().replace(R.id.layout_container,
                     new HomeFragment()).commit();
 
         } else if (id == R.id.nav_logout) {
             mAuth.signOut();
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.clear();
+            editor.apply();
             Intent back = new Intent(getApplicationContext(),SignUpActivity.class);
             startActivity(back);
             finish();
