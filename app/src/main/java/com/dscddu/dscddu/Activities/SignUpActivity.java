@@ -1,5 +1,7 @@
 package com.dscddu.dscddu.Activities;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -29,7 +31,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Source;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -45,45 +50,26 @@ public class SignUpActivity extends BaseActivity implements
     private FirebaseFirestore db;
 
     private FirebaseAuth mAuth;
-
-    private Button loginBtn;
+    private SharedPreferences sharedPreferences;
     private GoogleSignInClient mGoogleSignInClient;
 
-    private EditText mName, mEmail, mPass, mCPass;
-    private Button signupBtn;
-//    private ProgressBar signupProgress;
     private  View parentLayout;
-    private String name, email, password, cpassword;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
-        getSupportActionBar().setTitle("Create Your Account");
         parentLayout = findViewById(android.R.id.content);
-        //initialization
-        mName = findViewById(R.id.name_EditText_signup);
-        mEmail = findViewById(R.id.email_EditText_signup);
-        mPass = findViewById(R.id.pass_EditText_signup);
-        mCPass = findViewById(R.id.cpass_EditText_signup);
-        signupBtn = findViewById(R.id.signupBtn);
-//        signupProgress = findViewById(R.id.progressBarSignUp);
-        //initialization for STRINGS
-
-
-        // Button listeners
+        sharedPreferences = getSharedPreferences("data", Context.MODE_PRIVATE);
         findViewById(R.id.signInButton).setOnClickListener(this);
-        signupBtn.setOnClickListener(this);
-        //login Button
-        loginBtn = findViewById(R.id.LoginBtn);
-        loginBtn.setOnClickListener(this);
+
+
 
         // Configure Google Sign In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
-        // [END config_signin]
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
 
@@ -98,7 +84,7 @@ public class SignUpActivity extends BaseActivity implements
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
-            updateUI(currentUser);
+        updateUI(currentUser);
     }
 
     @Override
@@ -139,16 +125,39 @@ public class SignUpActivity extends BaseActivity implements
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithCredential:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
+                            final FirebaseUser user = mAuth.getCurrentUser();
+                            Map<String, Object> user_data = new HashMap<>();
+                            user_data.put("displayName",user.getDisplayName());
+                            user_data.put("email",user.getEmail());
+//                            db.collection("users").document(user.getUid())
+//                                    .update(user_data)
+//                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+//                                        @Override
+//                                        public void onSuccess(Void aVoid) {
+////                                            Toast.makeText(getApplicationContext(),"Added to user" +
+////                                                    " Collection",Toast.LENGTH_SHORT).show();
+//                                            Log.d(TAG, "DocumentSnapshot successfully written!");
                             updateUI(user);
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(TAG, "signInWithCredential:failure", task.getException());
-                            //View parentLayout = findViewById(android.R.id.content);
-                            Snackbar.make(parentLayout, "Authentication Failed.",
-                                    Snackbar.LENGTH_SHORT).show();
-                            updateUI(null);
-                        }
+//                                        }
+//                                    })
+//                                    .addOnFailureListener(new OnFailureListener() {
+//                                        @Override
+//                                        public void onFailure(@NonNull Exception e) {
+//                                            Log.w(TAG, "Error writing document", e);
+//                                            Snackbar.make(findViewById(android.R.id.content),
+//                                                    "Something Went Wrong",Snackbar.LENGTH_LONG).show();
+//                                        }
+//                                    });
+
+
+                            } else {
+                                // If sign in fails, display a message to the user.
+                                Log.w(TAG, "signInWithCredential:failure", task.getException());
+                                //View parentLayout = findViewById(android.R.id.content);
+                                Snackbar.make(parentLayout, "Authentication Failed.",
+                                        Snackbar.LENGTH_SHORT).show();
+                                    updateUI(null);
+                            }
 
                         // [START_EXCLUDE]
                         hideProgressDialog();
@@ -195,37 +204,45 @@ public class SignUpActivity extends BaseActivity implements
     private void updateUI(FirebaseUser user) {
         hideProgressDialog();
         if (user != null) {
-//            mStatusTextView.setText(getString(R.string.google_status_fmt, user.getEmail()));
-//            mDetailTextView.setText(getString(R.string.firebase_status_fmt, user.getUid()));
-            Intent i = new Intent(getApplicationContext(),MainActivity.class);
-            startActivity(i);
-            finish();
+            boolean pageVisited = sharedPreferences.getBoolean("pageVisited",false);
+            if(pageVisited){
 
-            //TODO: CHANGE CODE
-//            mStatusTextView.setText(getString(R.string.emailpassword_status_fmt,
-//                    user.getEmail(), user.isEmailVerified()));
-//            mDetailTextView.setText(getString(R.string.firebase_status_fmt, user.getUid()));
-//
-//            findViewById(R.id.emailPasswordButtons).setVisibility(View.GONE);
-//            findViewById(R.id.emailPasswordFields).setVisibility(View.GONE);
-//            findViewById(R.id.signedInButtons).setVisibility(View.VISIBLE);
-//            findViewById(R.id.verifyEmailButton).setEnabled(!user.isEmailVerified());
-            //[Exclude - End]
-//            findViewById(R.id.signInButton).setVisibility(View.GONE);
-//            findViewById(R.id.signOutAndDisconnect).setVisibility(View.VISIBLE);
-        } else {
-//            mStatusTextView.setText(R.string.signed_out);
-//            mDetailTextView.setText(null);
-//            findViewById(R.id.signInButton).setVisibility(View.VISIBLE);
-//            findViewById(R.id.signOutAndDisconnect).setVisibility(View.GONE);
+                Intent home = new Intent(getApplicationContext(),HomeActivity.class);
+                startActivity(home);
+                finish();
+            }
+            else{
+                DocumentReference docIdRef = db.collection("users").document(user.getUid());
+                docIdRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = task.getResult();
+                            if (document.exists()) {
+                                Log.d(TAG, "Document exists!");
+                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                editor.putBoolean("pageVisited",true);
+                                editor.apply();
+                                Intent h = new Intent(getApplicationContext(),
+                                        HomeActivity.class);
+                                startActivity(h);
+                                finish();
+                            } else {
+                                Log.d(TAG, "Document does not exist!");
+                                Snackbar.make(findViewById(android.R.id.content),"Please fill up " +
+                                        "your details",Snackbar.LENGTH_SHORT).show();
+                                Intent userPage = new Intent(getApplicationContext(),UserDetailsActivity.class);
+                                startActivity(userPage);
+                                finish();
+                            }
+                        } else {
+                            Log.d(TAG, "Failed with: ", task.getException());
+                        }
+                    }
+                });
 
-            //TODO:CHANGE IT
-//            mStatusTextView.setText(R.string.signed_out);
-//            mDetailTextView.setText(null);
-//
-//            findViewById(R.id.emailPasswordButtons).setVisibility(View.VISIBLE);
-//            findViewById(R.id.emailPasswordFields).setVisibility(View.VISIBLE);
-//            findViewById(R.id.signedInButtons).setVisibility(View.GONE);
+
+            }
         }
     }
 
@@ -233,170 +250,9 @@ public class SignUpActivity extends BaseActivity implements
     public void onClick(View v) {
         int i = v.getId();
         if (i == R.id.signInButton) {
+            signOut();
             signInWithGoogle();
-        }else if(i == R.id.signupBtn){
-            name = mName.getText().toString().trim();
-            email = mEmail.getText().toString().trim();
-            password = mPass.getText().toString();
-            cpassword = mCPass.getText().toString();
-            if (name.isEmpty()) {
-                mName.setError("Name Required");
-                requestFocus(mName);
-                return;
-            }
-            if (email.isEmpty()) {
-                mEmail.setError("Email Required");
-                requestFocus(mEmail);
-                return;
-            }
-            if (password.isEmpty()) {
-                mPass.setError("Password Required");
-                requestFocus(mPass);
-                return;
-            }
-            //For Confirm Password
-            if (cpassword.isEmpty()) {
-                mCPass.setError("Confirm Password Required");
-                requestFocus(mCPass);
-                return;
-            }
-            // Validity of Password And Confirm Password
-            if(!password.equals(cpassword)){
-                mCPass.setError("Both Password must Match.");
-                requestFocus(mCPass);
-                return;
-            }
-            //TODO: START SIGNUP METHOD
-            createAccount(email,password,name);
-
-        }else if(i == R.id.LoginBtn){
-            Intent loginIntent = new Intent(getApplicationContext(),LoginActivity.class);
-            startActivity(loginIntent);
         }
     }
-
-    private void createAccount(final String email, String password, final String name_i) {
-        Log.d(TAG, "createAccount:" + email);
-
-
-        showProgressDialog();
-
-        // [START create_user_with_email]
-        mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "createUserWithEmail:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            Snackbar.make(parentLayout, "User Registered",
-                                    Snackbar.LENGTH_SHORT).show();
-                            //After Account creation send Email to verify user.
-                            sendEmailVerification();
-                            //END-Email Verification
-
-                            UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                                    .setDisplayName(name_i)
-                                    .build();
-
-                            user.updateProfile(profileUpdates)
-                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            if (task.isSuccessful()) {
-                                                Log.d(TAG, "User - Name updated.");
-                                            }
-                                        }
-                                    });
-                            //Add Data to Firestore in Users Collections
-                            Map<String, Object> user_data = new HashMap<>();
-                            user_data.put("displayName",name_i);
-                            user_data.put("email",email);
-
-
-                            db.collection("users").document(user.getUid())
-                                    .set(user_data)
-                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            Toast.makeText(getApplicationContext(),"Added to user" +
-                                                    " Collection",Toast.LENGTH_SHORT).show();
-                                            Log.d(TAG, "DocumentSnapshot successfully written!");
-                                        }
-                                    })
-                                    .addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            Log.w(TAG, "Error writing document", e);
-                                        }
-                                    });
-                            updateUI(user);
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(TAG, "createUserWithEmail:failure", task.getException());
-
-                            Snackbar.make(parentLayout, "Authentication Failed.",
-                                    Snackbar.LENGTH_SHORT).show();
-//                            Toast.makeText(EmailPasswordActivity.this, "Authentication failed.",
-//                                    Toast.LENGTH_SHORT).show();
-                            updateUI(null);
-                        }
-//                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
-
-                        // [START_EXCLUDE]
-                        hideProgressDialog();
-                        // [END_EXCLUDE]
-                    }
-                });
-        // [END create_user_with_email]
-    }
-
-    private void sendEmailVerification() {
-        // Disable button
-        //findViewById(R.id.verifyEmailButton).setEnabled(false);
-        // Send verification email
-        // [START send_email_verification]
-        final FirebaseUser user = mAuth.getCurrentUser();
-        user.sendEmailVerification()
-                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        // [START_EXCLUDE]
-                        // Re-enable button
-                        //findViewById(R.id.verifyEmailButton).setEnabled(true);
-
-                        if (task.isSuccessful()) {
-                            Snackbar.make(parentLayout,
-                                    "Verification email sent to " + user.getEmail(),
-                                    Snackbar.LENGTH_SHORT).show();
-                            Toast.makeText(SignUpActivity.this,
-                                    "Verification email sent to " + user.getEmail(),
-                                    Toast.LENGTH_SHORT).show();
-                        } else {
-                            Log.e(TAG, "sendEmailVerification", task.getException());
-                            Snackbar.make(parentLayout,
-                                    "Failed to Sent Email for Verification.",
-                                    Snackbar.LENGTH_SHORT).show();
-                            Toast.makeText(SignUpActivity.this,
-                                    "Failed to send verification email.",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                        // [END_EXCLUDE]
-                    }
-                });
-        // [END send_email_verification]
-    }
-    //For Showing error on Edit Text
-    private void requestFocus(View view) {
-        if (view.requestFocus()) {
-            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-        }
-    }
-    //End - Request Focus
-
-
-
 
 }
