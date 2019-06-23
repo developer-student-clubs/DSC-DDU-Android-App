@@ -60,9 +60,13 @@ public class OnBoardingActivity extends AppCompatActivity {
 
         final List<LayoutScreenForOnBoarding> mList = new ArrayList<>();
         // fill list screen
-        mList.add(new LayoutScreenForOnBoarding("Fresh Food","Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua, consectetur  consectetur adipiscing elit",R.drawable.img1));
-        mList.add(new LayoutScreenForOnBoarding("Fast Delivery","Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua, consectetur  consectetur adipiscing elit",R.drawable.img2));
-        mList.add(new LayoutScreenForOnBoarding("Easy Payment","Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua, consectetur  consectetur adipiscing elit",R.drawable.img3));
+        mList.add(new LayoutScreenForOnBoarding("Easy Event Registration","Be the first one " +
+                "register for all the events by DSC-DDU",R.drawable.ic_calendar));
+        mList.add(new LayoutScreenForOnBoarding("Fast Notification","Never miss a single event by" +
+                " receiving regular notifications.",
+                R.drawable.ic_notification));
+        mList.add(new LayoutScreenForOnBoarding("e-Certificates for Events","Easily Download " +
+                "e-Certificates for the events participated",R.drawable.ic_medal));
 
         // setup viewpager
         adapter = new IntroViewPagerAdapter(this,mList);

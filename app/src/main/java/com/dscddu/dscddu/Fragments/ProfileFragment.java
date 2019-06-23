@@ -3,107 +3,135 @@ package com.dscddu.dscddu.Fragments;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.dscddu.dscddu.Model_Class.EventDetailsModel;
+import com.dscddu.dscddu.Model_Class.ProfileModel;
 import com.dscddu.dscddu.R;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link ProfileFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link ProfileFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.util.Hashtable;
+
+import static android.support.constraint.Constraints.TAG;
+
+
 public class ProfileFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    private OnFragmentInteractionListener mListener;
-
+    private View rootView;
+    private TextView name,email,branch,collegeid,lname,fname,phone,sem;
+    private ImageView imageView;
+    private FirebaseFirestore db;
+    private FirebaseUser user;
+    private FirebaseAuth mAuth;
+    private Hashtable<Double,String> branchTable;
     public ProfileFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ProfileFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static ProfileFragment newInstance(String param1, String param2) {
-        ProfileFragment fragment = new ProfileFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_profile, container, false);
+        rootView = inflater.inflate(R.layout.fragment_profile, container, false);
+        initUI();
+        return rootView;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
+    private void initUI() {
+        branchTable = new Hashtable<Double, String>()
+        {{
+            put(1.0,"CE");
+            put( 2.0,"IT");
+            put(3.0,"EC");
+            put( 4.0,"IC");
+            put(5.0,"CH");
+        }};
+        db = FirebaseFirestore.getInstance();
+        mAuth = FirebaseAuth.getInstance();
+        user = mAuth.getCurrentUser();
+        name = rootView.findViewById(R.id.profile_name);
+        imageView = rootView.findViewById(R.id.profile_photo);
+        collegeid = rootView.findViewById(R.id.profile_collegeid);
+        branch = rootView.findViewById(R.id.profile_branch);
+        email = rootView.findViewById(R.id.profile_email);
+        fname = rootView.findViewById(R.id.profile_fname);
+        lname = rootView.findViewById(R.id.profile_lname);
+        phone = rootView.findViewById(R.id.profile_phone);
+        sem = rootView.findViewById(R.id.profile_sem);
+
+        readData(profileModel -> {
+            name.setText(user.getDisplayName());
+            Glide.with(getContext()).load(user.getPhotoUrl()).into(imageView);
+            collegeid.setText(profileModel.getCollegeId());
+            branch.setText(profileModel.getBranch());
+            email.setText(user.getEmail());
+            fname.setText(profileModel.getFirstName());
+            lname.setText(profileModel.getLastName());
+            phone.setText(profileModel.getPhoneNumber());
+            sem.setText(String.valueOf( profileModel.getSem().intValue()));
+        });
+
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-//        if (context instanceof OnFragmentInteractionListener) {
-//            mListener = (OnFragmentInteractionListener) context;
-//        } else {
-//            throw new RuntimeException(context.toString()
-//                    + " must implement OnFragmentInteractionListener");
-//        }
+    private void readData(FirestoreCallback firestoreCallback){
+        DocumentReference docRef = db.collection("users").document(user.getUid());
+        docRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                    try {
+                        ProfileModel details = new ProfileModel();
+                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                        details.setFirstName((String)document.get("firstName"));
+                        details.setLastName((String) document.get("lastName"));
+                        details.setPhoneNumber((String) document.get("phoneNumber"));
+                        details.setSem((Double) document.get("sem"));
+                        details.setCollegeId((String) document.get("collegeId"));
+                        details.setBranch(branchTable.get(document.get("branch")));
+
+                        firestoreCallback.doCallback(details);
+
+                    }catch (IllegalAccessError e){
+                        Log.d(TAG, "Something is missing in document");
+                        Snackbar.make(getActivity().findViewById(android.R.id.content),"Something Went Wrong",
+                                Snackbar.LENGTH_LONG).show();
+                    }
+                } else {
+                    Log.d(TAG, "No such document");
+                    Snackbar.make(getActivity().findViewById(android.R.id.content),"Something Went" +
+                                    " Wrong",
+                            Snackbar.LENGTH_LONG).show();
+                }
+            } else {
+                Log.d(TAG, "get failed with ", task.getException());
+                Snackbar.make(getActivity().findViewById(android.R.id.content),"Something Went " +
+                                "Wrong",
+                        Snackbar.LENGTH_LONG).show();
+            }
+        });
     }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
+    private interface FirestoreCallback{
+        void doCallback(ProfileModel profileModel);
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
-    }
 }
