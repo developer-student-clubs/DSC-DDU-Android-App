@@ -4,8 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.view.View;
 import android.support.v4.view.GravityCompat;
@@ -22,20 +20,23 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.dscddu.dscddu.Fragments.EventDetailsFragment;
 import com.dscddu.dscddu.Fragments.HomeFragment;
 import com.dscddu.dscddu.Fragments.ProfileFragment;
+import com.dscddu.dscddu.Fragments.RegisterConfirmationDialog;
+import com.dscddu.dscddu.Listeners.FragmentActionListener;
 import com.dscddu.dscddu.R;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.GetTokenResult;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class HomeActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, FragmentActionListener {
     private FirebaseAuth mAuth;
     private FirebaseUser user;
     private FragmentManager fragmentManager;
     private SharedPreferences sharedPreferences;
+    private FirebaseFirestore db;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -45,6 +46,7 @@ public class HomeActivity extends AppCompatActivity
         //init
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
+        db = FirebaseFirestore.getInstance();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -60,9 +62,7 @@ public class HomeActivity extends AppCompatActivity
 //                        .setAction("Action", null).show();
 //            }
 //        });
-        getSupportActionBar().setTitle("Home");
-        fragmentManager.beginTransaction().replace(R.id.layout_container,
-                new HomeFragment()).commit();
+        setHomeFragment();
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -131,16 +131,14 @@ public class HomeActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_home) {
-            getSupportActionBar().setTitle("Home");
-            fragmentManager.beginTransaction().replace(R.id.layout_container,
-                    new HomeFragment()).commit();
+            setHomeFragment();
 
         } else if (id == R.id.nav_profile) {
             getSupportActionBar().setTitle("Profile");
             fragmentManager.beginTransaction().replace(R.id.layout_container,
                     new ProfileFragment()).commit();
 
-        } else if (id == R.id.nav_settings) {
+        } else if (id == R.id.nav_events_registered) {
             getSupportActionBar().setTitle("Settings");
             fragmentManager.beginTransaction().replace(R.id.layout_container,
                     new HomeFragment()).commit();
@@ -160,6 +158,14 @@ public class HomeActivity extends AppCompatActivity
         return true;
     }
 
+    private void setHomeFragment() {
+        getSupportActionBar().setTitle("Home");
+        HomeFragment homeFragment = new HomeFragment();
+        homeFragment.setFragmentActionListener(this::actionPerformed);
+        fragmentManager.beginTransaction().replace(R.id.layout_container,
+                homeFragment).commit();
+    }
+
     public void updateNavHeader(){
         NavigationView navigationView = findViewById(R.id.nav_view);
         View headerView = navigationView.getHeaderView(0);
@@ -172,4 +178,34 @@ public class HomeActivity extends AppCompatActivity
         Glide.with(this).load(user.getPhotoUrl()).into(imageView);
 
     }
+
+    @Override
+    public void actionPerformed(Bundle bundle) {
+        int action = bundle.getInt(FragmentActionListener.ACTION_KEY);
+        switch (action){
+            case FragmentActionListener.ACTION_VALUE_EVENT_DETAILS:
+                //Invoke Activity as per requirement
+                EventDetailsFragment eventDetailsFragment= new EventDetailsFragment();
+                eventDetailsFragment.setFragmentActionListener(this);
+                eventDetailsFragment.setArguments(bundle);
+                fragmentManager.beginTransaction()
+                        .replace(R.id.layout_container,eventDetailsFragment).addToBackStack(null)
+                        .commit();
+                break;
+
+
+            case FragmentActionListener.ACTION_VALUE_REGISTER:
+
+                RegisterConfirmationDialog registerConfirmationDialog =
+                        new RegisterConfirmationDialog();
+                registerConfirmationDialog.setFragmentActionListener(this);
+                registerConfirmationDialog.setArguments(bundle);
+                registerConfirmationDialog.show(fragmentManager,"RegisterConfirmationDialog");
+                break;
+            case FragmentActionListener.ACTION_VALUE_BACK_TO_HOME:
+                setHomeFragment();
+                break;
+        }
+    }
+
 }
