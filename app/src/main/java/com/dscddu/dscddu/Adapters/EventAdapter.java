@@ -10,7 +10,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.dscddu.dscddu.Fragments.HomeFragment;
 import com.dscddu.dscddu.Model_Class.EventModel;
 import com.dscddu.dscddu.R;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
@@ -48,7 +47,7 @@ public class EventAdapter extends FirestoreRecyclerAdapter<EventModel,EventAdapt
         public EventHolder(@NonNull View itemView) {
             super(itemView);
             view = itemView;
-            eventName = itemView.findViewById(R.id.eventTitle);
+            eventName = itemView.findViewById(R.id.history_eventTitle);
             imageView = itemView.findViewById(R.id.imageEvent);
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

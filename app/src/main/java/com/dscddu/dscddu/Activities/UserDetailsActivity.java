@@ -60,7 +60,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
             put("IT", 2.0);
             put("EC",3.0);
             put("IC", 4.0);
-            put("C", 5.0);
+            put("CH", 5.0);
         }};
         semTable = new Hashtable<String, Double>()
         {{
@@ -147,7 +147,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
                 Map<String, Object> data = new HashMap<>();
                 data.put("firstName", fname.getText().toString() );
                 data.put("lastName", lname.getText().toString());
-                data.put("phoneNumber", Double.parseDouble(phone.getText().toString()));
+                data.put("phoneNumber",phone.getText().toString());
                 data.put("collegeId", collegeID.getText().toString());
                 data.put("branch", branchNum);
                 data.put("sem", semNum);

@@ -35,7 +35,7 @@
     <string name="event_extra">Extra</string>
     <string name="event_what_to_bring">What to Bring:</string>
     <string name="event_date">Date:</string>
-    <string name="dialog_question" >Are You Sure to Register?</string>
+    <string name="dialog_question">Are You Sure to Register?</string>
     <string name="dialog_quest_description">This action cannot be changed</string>
     <string name="registration_mesg">You are successfully Registered</string>
     <string name="check_available">Checking for Availability</string>
@@ -47,4 +47,5 @@
     <string name="register_error">Oops! Something went wrong</string>
     <string name="register_noseats">Sorry, You are late. No seats are available.</string>
     <string name="menu_registered_events">Registered Events</string>
+    <string name="your_qr_code">QR Code</string>
 </resources>

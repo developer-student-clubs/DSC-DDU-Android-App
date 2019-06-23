@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dscddu.dscddu.Adapters.EventAdapter;
@@ -28,6 +29,7 @@ public class HomeFragment extends Fragment {
     private RecyclerView recyclerView;
     private FragmentActionListener fragmentActionListener;
     private EventAdapter adapter;
+    private TextView empty;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -57,12 +59,26 @@ public class HomeFragment extends Fragment {
         recyclerView = rootView.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(linearLayoutManager);
         rootRef = FirebaseFirestore.getInstance();
+        empty = rootView.findViewById(R.id.emptyViewEventsList);
+        empty.setVisibility(View.INVISIBLE);
         Query query = rootRef.collection("events")
                 .orderBy("postedOn", Query.Direction.DESCENDING);
         FirestoreRecyclerOptions<EventModel> options = new FirestoreRecyclerOptions.Builder<EventModel>()
                 .setQuery(query, EventModel.class)
                 .build();
-        adapter = new EventAdapter(con,options);
+        adapter = new EventAdapter(con,options){
+            @Override
+            public void onDataChanged() {
+                super.onDataChanged();
+                if(getItemCount() == 0){
+                    empty.setVisibility(View.VISIBLE);
+                    recyclerView.setVisibility(View.GONE);
+                }else{
+                    empty.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
+                }
+            }
+        };
         recyclerView.setAdapter(adapter);
         adapter.setOnItemClickListener((documentSnapshot, position) -> {
             EventModel e = documentSnapshot.toObject(EventModel.class);

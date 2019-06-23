@@ -206,57 +206,66 @@ public class EventDetailsFragment extends Fragment {
         }
         @Override
         protected Void doInBackground(Void... voids) {
-            DocumentReference docRef = db.collection("events").document(docID);
-            docRef.get().addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                        Double availableSeats = document.get("currentAvailable",Double.class);
-                        if(availableSeats <= 0){
-                            /**
-                             * NO SEATS AVAILABLE return 2
-                             * */
-                            onProgressUpdate(2);
-                        }else{
-                            db.collection("events").document(docID).collection("participants").document(user.getUid())
-                            .get().addOnCompleteListener(task1 -> {
-                                if (task1.isSuccessful()) {
-                                    DocumentSnapshot document1 = task1.getResult();
-                                    if (document1.exists()) {
-                                        Log.d(TAG, "DocumentSnapshot data: " + document1.getData());
-                                        /**
-                                         * Already Applied to Event - return 1
-                                         * */
-                                        onProgressUpdate(1);
+            db.collection("events").document(docID).collection("participants").document(user.getUid())
+                    .get().addOnCompleteListener(task1 -> {
+                if (task1.isSuccessful()) {
+                    DocumentSnapshot document1 = task1.getResult();
+                    if (document1.exists())
+                    {
+                        Log.d(TAG, "DocumentSnapshot data: " + document1.getData());
+                        /**
+                         * Already Applied to Event - return 1
+                         * */
+                        onProgressUpdate(1);
 
-                                    } else {
-                                        Log.d(TAG, "No such document");
+                    }
+                    else
+                    {
+                        Log.d(TAG, "No such document");
+                        /**
+                         * NOT YET REGISTERED - return 0 -- but wait check availability
+                         * */
+                        DocumentReference docRef = db.collection("events").document(docID);
+                        docRef.get().addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                DocumentSnapshot document = task.getResult();
+                                if (document.exists()) {
+                                    Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                                    Double availableSeats = document.get("currentAvailable",Double.class);
+                                    if(availableSeats <= 0){
                                         /**
-                                         * NOT YET REGISTERED - return 0
+                                         * NO SEATS AVAILABLE return 2
+                                         * */
+                                        onProgressUpdate(2);
+                                    }else{
+                                        /**
+                                         *  SEATS AVAILABLE return 0
                                          * */
                                         onProgressUpdate(0);
 
                                     }
+
                                 } else {
-                                    Log.d(TAG, "get failed with ", task1.getException());
+                                    Log.d(TAG, "No such document");
                                     Snackbar.make(getActivity().findViewById(android.R.id.content),
                                             "Something Went Wrong",Snackbar.LENGTH_LONG).show();
                                 }
-                            });
-                        }
+                            } else {
+                                Log.d(TAG, "get failed with ", task.getException());
+                                Snackbar.make(getActivity().findViewById(android.R.id.content),
+                                        "Something Went Wrong",Snackbar.LENGTH_LONG).show();
+                            }
+                        });
 
-                    } else {
-                        Log.d(TAG, "No such document");
-                        Snackbar.make(getActivity().findViewById(android.R.id.content),
-                                "Something Went Wrong",Snackbar.LENGTH_LONG).show();
                     }
                 } else {
-                    Log.d(TAG, "get failed with ", task.getException());
+                    Log.d(TAG, "get failed with ", task1.getException());
                     Snackbar.make(getActivity().findViewById(android.R.id.content),
                             "Something Went Wrong",Snackbar.LENGTH_LONG).show();
                 }
             });
+
+
 
             return null;
         }
