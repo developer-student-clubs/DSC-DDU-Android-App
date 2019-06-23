@@ -9,10 +9,6 @@
         android:roundIcon="@drawable/dsc_new"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Activities.EventDetailsActivity"
-            android:theme="@style/PlainTheme" android:parentActivityName=".Activities.HomeActivity"
-            android:screenOrientation="portrait"
-            ></activity>
         <activity
             android:name=".Activities.UserDetailsActivity"
             android:screenOrientation="portrait"

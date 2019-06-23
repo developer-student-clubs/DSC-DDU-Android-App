@@ -35,4 +35,16 @@
     <string name="event_extra">Extra</string>
     <string name="event_what_to_bring">What to Bring:</string>
     <string name="event_date">Date:</string>
+    <string name="dialog_question" >Are You Sure to Register?</string>
+    <string name="dialog_quest_description">This action cannot be changed</string>
+    <string name="registration_mesg">You are successfully Registered</string>
+    <string name="check_available">Checking for Availability</string>
+    <string name="register_text_for_btn">REGISTER</string>
+    <string name="already_registered">Already Registered</string>
+    <string name="no_seats">No Seats Available</string>
+    <string name="register_success">You are successfully registered</string>
+    <string name="register_alredyRegistered">Oops! You have already registered</string>
+    <string name="register_error">Oops! Something went wrong</string>
+    <string name="register_noseats">Sorry, You are late. No seats are available.</string>
+    <string name="menu_registered_events">Registered Events</string>
 </resources>
