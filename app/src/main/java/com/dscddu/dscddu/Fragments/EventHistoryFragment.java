@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.dscddu.dscddu.Adapters.EventAdapter;
 import com.dscddu.dscddu.Adapters.EventHistoryAdapter;
 import com.dscddu.dscddu.Listeners.FragmentActionListener;
+import com.dscddu.dscddu.Listeners.InternetCheck;
 import com.dscddu.dscddu.Model_Class.EventHistoryModel;
 import com.dscddu.dscddu.Model_Class.EventModel;
 import com.dscddu.dscddu.R;
@@ -76,6 +77,7 @@ public class EventHistoryFragment extends Fragment {
                 if(getItemCount() == 0){
                     emptyView.setVisibility(View.VISIBLE);
                     recyclerView.setVisibility(View.GONE);
+
                 }
                 else{
                     emptyView.setVisibility(View.GONE);
@@ -83,26 +85,6 @@ public class EventHistoryFragment extends Fragment {
                 }
             }
         };
-        recyclerView.setAdapter(adapter);
-        adapter.startListening();
-//add the listener for the single value event that will function
-//like a completion listener for initial data load of the FirebaseRecyclerAdapter
-//        rootRef.addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                //onDataChange called so remove progress bar
-//
-//                //make a call to dataSnapshot.hasChildren() and based
-//                //on returned value show/hide empty view
-//
-//                //use helper method to add an Observer to RecyclerView
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//
-//            }
-//        });
 //        adapter.setOnItemClickListener((documentSnapshot, position) -> {
 //            EventModel e = documentSnapshot.toObject(EventModel.class);
 //            String eName = e.getEventName();
@@ -116,7 +98,17 @@ public class EventHistoryFragment extends Fragment {
 //                fragmentActionListener.actionPerformed(bundle);
 //            }
 //        });
+        recyclerView.setAdapter(adapter);
+        adapter.startListening();
+
     }
+
+//    @Override
+//    public void onResume() {
+//        super.onResume();
+//
+//    }
+
     @Override
     public void onStart() {
         super.onStart();

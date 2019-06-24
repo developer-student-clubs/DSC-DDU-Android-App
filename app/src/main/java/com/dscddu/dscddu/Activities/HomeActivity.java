@@ -1,15 +1,14 @@
 package com.dscddu.dscddu.Activities;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.support.v4.view.GravityCompat;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -32,6 +31,7 @@ import com.dscddu.dscddu.Fragments.ProfileFragment;
 import com.dscddu.dscddu.Fragments.QrCodeFragment;
 import com.dscddu.dscddu.Fragments.RegisterConfirmationDialog;
 import com.dscddu.dscddu.Listeners.FragmentActionListener;
+import com.dscddu.dscddu.Fragments.NoInternetFragment;
 import com.dscddu.dscddu.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -102,7 +102,16 @@ public class HomeActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-
+//        new InternetCheck(internet -> {
+//            if(!internet){
+////                Snackbar.make(findViewById(android.R.id.content),"Oops!! No Internet " +
+////                        "Connections", Snackbar.LENGTH_INDEFINITE).setAction("Close",
+////                        v -> finishAndRemoveTask()).show();
+//                getSupportActionBar().setTitle("Oops!");
+//                fragmentManager.beginTransaction().replace(R.id.layout_container,
+//                        new NoInternetFragment()).commit();
+//            }
+//        });
     }
 
     @Override
@@ -140,7 +149,6 @@ public class HomeActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
@@ -149,35 +157,50 @@ public class HomeActivity extends AppCompatActivity
         if (id == R.id.nav_home) {
             setHomeFragment();
 
-        } else if (id == R.id.nav_profile) {
+        }
+        else if (id == R.id.nav_profile) {
             getSupportActionBar().setTitle("Profile");
-            fragmentManager.beginTransaction().replace(R.id.layout_container,
-                    new ProfileFragment()).commit();
+            ProfileFragment profileFragment = new ProfileFragment();
+            profileFragment.setFragmentActionListener(this::actionPerformed);
+            fragmentManager.popBackStack("eventDetails", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            fragmentManager.beginTransaction().replace(R.id.layout_container,profileFragment)
+                    .commit();
 
         }
-//        else if (id == R.id.nav_settings) {
-//            getSupportActionBar().setTitle("Settings");
-//            fragmentManager.beginTransaction().replace(R.id.layout_container,
-//                    new HomeFragment()).commit();
-//
-//        }
-        else if (id == R.id.nav_logout) {
-            mAuth.signOut();
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.clear();
-            editor.apply();
-            Intent back = new Intent(getApplicationContext(),SignUpActivity.class);
-            startActivity(back);
-            finish();
+        else if (id == R.id.nav_suggestion) {
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://docs.google.com/forms/d/12KOKGSMmLL-_Mi33QOJwIUzTsYxMu66LpjlMg9t6akk/edit?ts=5d10793e"));
+            startActivity(browserIntent);
         }
+        else if (id == R.id.nav_logout) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(HomeActivity.this);
+            builder.setMessage("Are you sure you want to logout?");
+            builder.setPositiveButton("Ok", (dialog, id1) -> {
+
+                mAuth.signOut();
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.clear();
+                editor.apply();
+                Intent back = new Intent(getApplicationContext(),SignUpActivity.class);
+                startActivity(back);
+                finish();
+            });
+            builder.setNegativeButton("Cancel", (dialog, id12) -> dialog.dismiss());
+            AlertDialog dialog = builder.create();
+            dialog.show();
+
+        }
+
         else if(id == R.id.nav_qr_code){
             getSupportActionBar().setTitle("Your QR Code");
+            fragmentManager.popBackStack("eventDetails", FragmentManager.POP_BACK_STACK_INCLUSIVE);
             fragmentManager.beginTransaction().replace(R.id.layout_container,
                     new QrCodeFragment()).commit();
 
         }
+
         else if(id == R.id.nav_events_registered){
             getSupportActionBar().setTitle(R.string.menu_registered_events);
+            fragmentManager.popBackStack("eventDetails", FragmentManager.POP_BACK_STACK_INCLUSIVE);
             fragmentManager.beginTransaction().replace(R.id.layout_container,
                     new EventHistoryFragment()).commit();
         }
@@ -191,8 +214,9 @@ public class HomeActivity extends AppCompatActivity
         getSupportActionBar().setTitle("Home");
         HomeFragment homeFragment = new HomeFragment();
         homeFragment.setFragmentActionListener(this::actionPerformed);
-        fragmentManager.beginTransaction().replace(R.id.layout_container,
-                homeFragment).commit();
+        fragmentManager.popBackStack("eventDetails", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        fragmentManager.beginTransaction().replace(R.id.layout_container, homeFragment)
+                .commit();
     }
 
     public void updateNavHeader(){
@@ -218,7 +242,8 @@ public class HomeActivity extends AppCompatActivity
                 eventDetailsFragment.setFragmentActionListener(this);
                 eventDetailsFragment.setArguments(bundle);
                 fragmentManager.beginTransaction()
-                        .replace(R.id.layout_container,eventDetailsFragment).addToBackStack(null)
+                        .replace(R.id.layout_container,eventDetailsFragment)
+                        .addToBackStack("eventDetails")
                         .commit();
                 break;
 
@@ -231,8 +256,19 @@ public class HomeActivity extends AppCompatActivity
                 registerConfirmationDialog.setArguments(bundle);
                 registerConfirmationDialog.show(fragmentManager,"RegisterConfirmationDialog");
                 break;
+
+
             case FragmentActionListener.ACTION_VALUE_BACK_TO_HOME:
                 setHomeFragment();
+                break;
+
+
+            case FragmentActionListener.ACTION_NO_INTERNET:
+                getSupportActionBar().setTitle("Oops!");
+                NoInternetFragment noInternetFragment = new NoInternetFragment();
+                fragmentManager.popBackStack("eventDetails", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                fragmentManager.beginTransaction().replace(R.id.layout_container,
+                        noInternetFragment).commit();
                 break;
         }
     }
