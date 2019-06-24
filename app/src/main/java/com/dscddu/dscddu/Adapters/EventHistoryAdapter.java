@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -59,19 +60,18 @@ public class EventHistoryAdapter extends FirestoreRecyclerAdapter<EventHistoryMo
     public class EventHistoryHolder extends RecyclerView.ViewHolder{
             private View view;
             private TextView eventName,attend;
+//            private Button feedback;
 
             public EventHistoryHolder(@NonNull View itemView) {
                 super(itemView);
                 view = itemView;
+//                feedback = itemView.findViewById(R.id.feedbackButton);
                 eventName = itemView.findViewById(R.id.history_eventTitle);
                 attend = itemView.findViewById(R.id.history_attendence);
-//                itemView.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-//                        int position = getAdapterPosition();
-//                        if(position != RecyclerView.NO_POSITION && listener != null)
-//                            listener.onItemClick(getSnapshots().getSnapshot(position),position);
-//                    }
+//                itemView.setOnClickListener(v -> {
+//                    int position = getAdapterPosition();
+//                    if(position != RecyclerView.NO_POSITION && listener != null)
+//                        listener.onItemClick(getSnapshots().getSnapshot(position),position);
 //                });
 
 
@@ -81,9 +81,9 @@ public class EventHistoryAdapter extends FirestoreRecyclerAdapter<EventHistoryMo
 //        public interface OnItemClickListener {
 //            void onItemClick(DocumentSnapshot documentSnapshot, int position);
 //        }
-//            public EventAdapter.OnItemClickListener listener;
+//        public EventAdapter.OnItemClickListener listener;
 //
-//            public void setOnItemClickListener(EventAdapter.OnItemClickListener listener) {
+//        public void setOnItemClickListener(EventAdapter.OnItemClickListener listener) {
 //                this.listener = listener;
-//            }
+//        }
 }

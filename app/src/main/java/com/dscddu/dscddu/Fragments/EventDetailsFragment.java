@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.dscddu.dscddu.Listeners.FragmentActionListener;
+import com.dscddu.dscddu.Listeners.InternetCheck;
 import com.dscddu.dscddu.Model_Class.EventDetailsModel;
 import com.dscddu.dscddu.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -129,11 +130,21 @@ public class EventDetailsFragment extends Fragment {
         });
 
         register.setOnClickListener(v -> {
+            progressBar.setVisibility(View.VISIBLE);
+            register.setEnabled(false);
+            new InternetCheck(internet -> {
+                if(!internet){
+                    if(fragmentActionListener!=null){
+                        Bundle bun = new Bundle();
+                        bun.putInt(FragmentActionListener.ACTION_KEY,
+                                FragmentActionListener.ACTION_NO_INTERNET);
+                        fragmentActionListener.actionPerformed(bun);
+                    }
+                }
+            });
             if(fragmentActionListener!=null){
                 RegisterTask task1 = new RegisterTask();
                 task1.execute();
-                progressBar.setVisibility(View.VISIBLE);
-                register.setEnabled(false);
 
             }
 
@@ -151,6 +162,16 @@ public class EventDetailsFragment extends Fragment {
     public void onResume() {
         super.onResume();
         ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(eventName);
+        new InternetCheck(internet -> {
+            if(!internet){
+                if(fragmentActionListener!=null){
+                    Bundle bundle = new Bundle();
+                    bundle.putInt(FragmentActionListener.ACTION_KEY,
+                            FragmentActionListener.ACTION_NO_INTERNET);
+                    fragmentActionListener.actionPerformed(bundle);
+                }
+            }
+        });
     }
 
     private void readData(FirestoreCallback firestoreCallback){

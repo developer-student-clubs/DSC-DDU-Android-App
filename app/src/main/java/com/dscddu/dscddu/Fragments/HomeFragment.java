@@ -10,10 +10,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.dscddu.dscddu.Adapters.EventAdapter;
 import com.dscddu.dscddu.Listeners.FragmentActionListener;
+import com.dscddu.dscddu.Listeners.InternetCheck;
 import com.dscddu.dscddu.Model_Class.EventModel;
 import com.dscddu.dscddu.R;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
@@ -39,6 +39,16 @@ public class HomeFragment extends Fragment {
     public void onResume() {
         super.onResume();
         ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Events");
+        new InternetCheck(internet -> {
+            if(!internet){
+                if(fragmentActionListener!=null){
+                    Bundle bundle = new Bundle();
+                    bundle.putInt(FragmentActionListener.ACTION_KEY,
+                            FragmentActionListener.ACTION_NO_INTERNET);
+                    fragmentActionListener.actionPerformed(bundle);
+                }
+            }
+        });
     }
     public void setFragmentActionListener(FragmentActionListener fragmentActionListener){
         this.fragmentActionListener = fragmentActionListener;

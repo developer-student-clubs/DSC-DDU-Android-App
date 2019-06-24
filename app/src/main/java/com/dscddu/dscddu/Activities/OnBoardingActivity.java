@@ -3,6 +3,8 @@ package com.dscddu.dscddu.Activities;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -15,9 +17,13 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 
 import com.dscddu.dscddu.Adapters.IntroViewPagerAdapter;
+import com.dscddu.dscddu.Listeners.InternetCheck;
 import com.dscddu.dscddu.Model_Class.LayoutScreenForOnBoarding;
 import com.dscddu.dscddu.R;
 
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -121,6 +127,17 @@ public class OnBoardingActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        new InternetCheck(internet -> {
+            if(!internet){
+                Snackbar.make(findViewById(android.R.id.content),"oops No Internet",
+                        Snackbar.LENGTH_LONG).show();
+            }
+        });
+    }
+
     private void OpenSignUpForm() {
         Intent i = new Intent(getApplicationContext(),SignUpActivity.class);
         startActivity(i);
@@ -150,4 +167,10 @@ public class OnBoardingActivity extends AppCompatActivity {
         //TODO: add animation to GetStarted Button
         getStarted.setAnimation(animatioButton);
     }
+
+
+
+
+
+
 }
