@@ -1,0 +1,52 @@
+<resources>
+    <string name="app_name">DSC DDU</string>
+    <string name="forgetPass">Forget Password</string>
+    <string name="createAccString">Didn\'t have Account, Create New</string>
+    <string name="loginScreen_email">Email Address</string>
+    <string name="loginScreen_password">Password</string>
+    <string name="Btn_name_Signup">SIGN UP</string>
+    <string name="SignupScreen_name_hint">Name</string>
+    <string name="SignupScreen_email_hint">Email Address</string>
+    <string name="SignupScreen_pass_hint">Password</string>
+    <string name="SignupScreen_cpass_hint">Confirm Password</string>
+    <string name="welcome_text">Welcome to DSC DDU</string>
+    <string name="verify_email_desc">Email is already sent to you. Please Verify it.</string>
+    <string name="title_activity_home">HomeActivity</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="menu_home">Home</string>
+    <string name="menu_profile">Profile</string>
+    <string name="menu_setting">Settings</string>
+    <!--<string name="menu_tools">Tools</string>-->
+    <!--<string name="menu_share">Share</string>-->
+    <string name="menu_logout">Logout</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="event_branch">Branch:</string>
+    <string name="event_venue">Venue:</string>
+    <string name="event_time">Timings:</string>
+    <string name="event_sem">Semester:</string>
+    <string name="event_extra">Extra</string>
+    <string name="event_what_to_bring">What to Bring:</string>
+    <string name="event_date">Date:</string>
+    <string name="dialog_question">Are You Sure to Register?</string>
+    <string name="dialog_quest_description">This action cannot be changed</string>
+    <string name="registration_mesg">You are successfully Registered</string>
+    <string name="check_available">Checking for Availability</string>
+    <string name="register_text_for_btn">REGISTER</string>
+    <string name="already_registered">Already Registered</string>
+    <string name="no_seats">No Seats Available</string>
+    <string name="register_success">You are successfully registered</string>
+    <string name="register_alredyRegistered">Oops! You have already registered</string>
+    <string name="register_error">Oops! Something went wrong</string>
+    <string name="register_noseats">Sorry, You are late. No seats are available.</string>
+    <string name="menu_registered_events">Registered Events</string>
+    <string name="your_qr_code">QR Code</string>
+    <string name="nav_suggestion_app">Give Suggestion</string>
+</resources>
