@@ -16,17 +16,13 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.dscddu.dscddu.Listeners.FragmentActionListener;
 import com.dscddu.dscddu.Listeners.InternetCheck;
 import com.dscddu.dscddu.Model_Class.EventDetailsModel;
 import com.dscddu.dscddu.R;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -36,7 +32,7 @@ import com.google.firebase.firestore.WriteBatch;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * msgInt == 0 --> Success
@@ -130,7 +126,7 @@ public class EventDetailsFragment extends Fragment {
         });
 
         register.setOnClickListener(v -> {
-            progressBar.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.INVISIBLE);
             register.setEnabled(false);
             new InternetCheck(internet -> {
                 if(!internet){
@@ -253,6 +249,11 @@ public class EventDetailsFragment extends Fragment {
                                 if (document.exists()) {
                                     Log.d(TAG, "DocumentSnapshot data: " + document.getData());
                                     Double availableSeats = document.get("currentAvailable",Double.class);
+//                                    Double totalSeats = document.get("totalSeats",Double.class);
+
+//                                    if(totalSeats == 0){
+//
+//                                    }
                                     if(availableSeats <= 0){
                                         /**
                                          * NO SEATS AVAILABLE return 2
@@ -281,8 +282,8 @@ public class EventDetailsFragment extends Fragment {
                     }
                 } else {
                     Log.d(TAG, "get failed with ", task1.getException());
-                    Snackbar.make(getActivity().findViewById(android.R.id.content),
-                            "Something Went Wrong",Snackbar.LENGTH_LONG).show();
+//                    Snackbar.make(getActivity().findViewById(android.R.id.content),
+//                            "Something Went Wrong",Snackbar.LENGTH_LONG).show();
                 }
             });
 
@@ -294,6 +295,7 @@ public class EventDetailsFragment extends Fragment {
          * registerInt == 0 --> Not Registered
          * registerInt == 1 --> Already Registered
          * registerInt == 2 --> No Seats Available
+         * registerInt == 3 --> EVent Registration Not Started
          * */
         @Override
         protected void onProgressUpdate(Integer... values) {
@@ -337,6 +339,7 @@ public class EventDetailsFragment extends Fragment {
          * msgInt == 1 --> Already Registered
          * msgInt == 2 --> some Error
          * msgInt == 3 --> No Seats Available
+         * msgInt == 4 --> Registration Not Yet Started --OR-- Registration CLOSED (NOT IMPLEMENTED)
          * */
         @Override
         protected Void doInBackground(Void... voids) {
@@ -352,119 +355,207 @@ public class EventDetailsFragment extends Fragment {
                          * USER IS ALREADY REGISTERED return 1
                          * */
                         onProgressUpdate(1);
-                    } else {
+                    } else
+                        {
+                        /**
+                         * Test START
+                         * */
+                        final DocumentReference sfDocRef = db.collection("events").document(docID);
 
-                        Log.d(TAG, "No such document, 1st time Registration");
-                        DocumentReference docRef1 = db.collection("events").document(docID);
-                        docRef1.get().addOnCompleteListener(task -> {
-                            if (task.isSuccessful()) {
-                                DocumentSnapshot document = task.getResult();
-                                if (document.exists()) {
-                                    try{
-                                        Double totalSeats = document.get("totalSeats",Double.class);
-                                        Double availableSeats = document.get("currentAvailable",Double.class);
-                                        if(availableSeats <= 0)
-                                        {
-                                            /**
-                                             * NO SEATS AVAILABLE -- return 3
-                                             * */
-                                            msgInt =3;
-                                            onProgressUpdate(3);
-                                        }
-                                        else if(availableSeats > 0 && totalSeats > 0)
-                                        {
+                            //TODO: Registration will OPEN SOON OPTION - by making totalSeats == 0
+                            db.runTransaction(transaction -> {
+                                DocumentSnapshot snapshot = transaction.get(sfDocRef);
 
-                                            Map<String, Object> data = new HashMap<>();
-                                            data.put("attended", false);
+                                Double totalSeats = snapshot.getDouble("totalSeats");
+                                Double availableSeats = snapshot.getDouble("currentAvailable");
 
-                                            Map<String, Object> dataUser = new HashMap<>();
-                                            dataUser.put("attended", false);
-                                            dataUser.put("eventName",eventName);
-
-                                            WriteBatch batch = db.batch();
-
-                                            // Set the Participants in Particular Document ID
-                                            DocumentReference nycRef = db.collection("events").document(docID).collection(
-                                                    "participants").document(user.getUid());
-                                            batch.set(nycRef,data);
-
-                                            // Set Event Name in Users Event Collection
-                                            DocumentReference sfRef = db.collection("users").document(user.getUid()).collection(
-                                                    "events").document(docID);
-                                            batch.set(sfRef,dataUser);
-
-                                            //Update The Availability to new Value
-                                            DocumentReference Ref = db.collection("events").document(docID);
-                                            batch.update(Ref,"currentAvailable",availableSeats-1);
-                                            // Commit the batch
-                                            batch.commit().addOnCompleteListener(task1 -> {
-//                                                Toast.makeText(getContext(),"Batch Complete",Toast.LENGTH_SHORT).show();
-                                                /**
-                                                 * User Registration successful -- return 0
-                                                 * */
-                                                onProgressUpdate(0);
-                                            }).addOnFailureListener(e -> {
-                                                /**
-                                                 * Batch Write Failed -- return 2
-                                                 * */
-                                                onProgressUpdate(2);
-                                            });
-
-                                        }
-                                        else
-                                        {
-                                            Snackbar.make(getActivity().findViewById(android.R.id.content),
-                                                    "Something Went Wrong",Snackbar.LENGTH_LONG).show();
-                                            msgInt = 2;
-                                            /**
-                                             * Some Error Occured -- May be total seats <= 0
-                                             * return 2
-                                             * */
-                                            Log.d(TAG,"Some Error Occured -- May be total seats " +
-                                                    "<= 0");
-                                            onProgressUpdate(2);
-                                        }
-                                    }catch (NullPointerException e)
-                                        {
-                                        /**
-                                         * Error occur due to No Fields Found Corresponding to
-                                         * variables totalSeats and currentAvailable
-                                         *
-                                         * return 2
-                                         * */
-                                        Log.d(TAG,"No Fields Found Corresponding to variables " +
-                                                "totalSeats and currentAvailable: " + e);
-                                        onProgressUpdate(2);
-                                    }
-//                                    Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                                }
-                                else {
-                                    Log.d(TAG, "No such document");
-                                    Snackbar.make(getActivity().findViewById(android.R.id.content),
-                                            "Something Went Wrong",Snackbar.LENGTH_LONG).show();
-                                    msgInt = 2;
+                                Double varr;
+                                if(availableSeats <= 0) {
                                     /**
-                                     * Some Error Occured -- Document Doesn't Exist --- return 2
+                                     * NO SEATS AVAILABLE -- return 3
                                      * */
-                                    onProgressUpdate(2);
-
+                                    varr = 3.0;
+                                    transaction.update(sfDocRef, "currentAvailable",
+                                            availableSeats);
+                                    return varr;
                                 }
-                            } else {
-                                Log.d(TAG, "get failed with ", task.getException());
-                                Snackbar.make(getActivity().findViewById(android.R.id.content),
-                                        "Something Went Wrong",Snackbar.LENGTH_LONG).show();
-                                msgInt = 2;
-                                /**
-                                 * Some Error Occured -- Maybe due to Internet Connection -
-                                 * ---- return 2
-                                 * */
-                                onProgressUpdate(2);
-                            }
-                        });
+                                if (availableSeats > 0) {
+
+                                    //transaction.update(sfDocRef, "population", newPopulation);
+                                    Map<String, Object> data = new HashMap<>();
+                                    data.put("attended", false);
+
+
+                                    Map<String, Object> dataUser = new HashMap<>();
+                                    dataUser.put("attended", false);
+                                    dataUser.put("eventName", eventName);
+//                                    AtomicBoolean flag = new AtomicBoolean(false);
+                                    WriteBatch batch = db.batch();
+
+                                    // Set the Participants in Particular Document ID
+                                    DocumentReference nycRef = db.collection("events").document(docID).collection(
+                                            "participants").document(user.getUid());
+                                    batch.set(nycRef, data);
+
+                                    // Set Event Name in Users Event Collection
+                                    DocumentReference sfRef = db.collection("users").document(user.getUid()).collection(
+                                            "events").document(docID);
+                                    batch.set(sfRef, dataUser);
+                                    batch.commit().addOnCompleteListener(task1 -> {
+
+                                        /**
+                                         * User Registration successful -- return 0
+                                         * */
+//                                        onProgressUpdate(0);
+//                                        flag.set(true);
+                                    });
+//                                    //Update The Availability to new Value through transaction
+//                                    DocumentReference Ref = db.collection("events").document(docID);
+//                                    batch.update(Ref, "currentAvailable", availableSeats - 1);
+                                    transaction.update(sfDocRef, "currentAvailable",
+                                            availableSeats - 1);
+
+                                    return 0.0;
+                                }
+                                return null;
+                            })
+                            .addOnSuccessListener(result ->{
+                                    Log.d(TAG, "Transaction success: " + result);
+                                    if(result == 3.0){
+                                        /**
+                                         * NO SEATS AVAILABLE -- return 3
+                                         * */
+                                        onProgressUpdate(3);
+
+                                    }
+                                    else if(result == 0.0){
+                                        /**
+                                         * User Registration successful -- return 0
+                                         * */
+                                        onProgressUpdate(0);
+                                    }
+                            })
+                            .addOnFailureListener(e -> {
+                                    /**
+                                    * Some Error -- return 2
+                                    * */
+                                    onProgressUpdate(2);
+                                    Log.w(TAG, "Transaction failure.", e);
+                            });
+                        /**
+                         * Test OVER
+                         * */
+//                        DocumentReference docRef1 = db.collection("events").document(docID);
+//                        docRef1.get().addOnCompleteListener(task -> {
+//                            if (task.isSuccessful()) {
+//                                DocumentSnapshot document = task.getResult();
+//                                if (document.exists()) {
+//                                    try{
+//                                        Double totalSeats = document.get("totalSeats",Double.class);
+//                                        Double availableSeats = document.get("currentAvailable",Double.class);
+//                                        if(availableSeats <= 0)
+//                                        {
+//                                            /**
+//                                             * NO SEATS AVAILABLE -- return 3
+//                                             * */
+//                                            msgInt =3;
+//                                            onProgressUpdate(3);
+//                                        }
+//                                        else if(availableSeats > 0 && totalSeats > 0)
+//                                        {
+//
+//                                            Map<String, Object> data = new HashMap<>();
+//                                            data.put("attended", false);
+//
+//                                            Map<String, Object> dataUser = new HashMap<>();
+//                                            dataUser.put("attended", false);
+//                                            dataUser.put("eventName",eventName);
+//
+//                                            WriteBatch batch = db.batch();
+//
+//                                            // Set the Participants in Particular Document ID
+//                                            DocumentReference nycRef = db.collection("events").document(docID).collection(
+//                                                    "participants").document(user.getUid());
+//                                            batch.set(nycRef,data);
+//
+//                                            // Set Event Name in Users Event Collection
+//                                            DocumentReference sfRef = db.collection("users").document(user.getUid()).collection(
+//                                                    "events").document(docID);
+//                                            batch.set(sfRef,dataUser);
+//
+//                                            //Update The Availability to new Value
+//                                            DocumentReference Ref = db.collection("events").document(docID);
+//                                            batch.update(Ref,"currentAvailable",availableSeats-1);
+//                                            // Commit the batch
+//                                            batch.commit().addOnCompleteListener(task1 -> {
+////                                                Toast.makeText(getContext(),"Batch Complete",Toast.LENGTH_SHORT).show();
+//                                                /**
+//                                                 * User Registration successful -- return 0
+//                                                 * */
+//                                                onProgressUpdate(0);
+//                                            }).addOnFailureListener(e -> {
+//                                                /**
+//                                                 * Batch Write Failed -- return 2
+//                                                 * */
+//                                                onProgressUpdate(2);
+//                                            });
+//
+//                                        }
+//                                        else
+//                                        {
+//                                            Snackbar.make(getActivity().findViewById(android.R.id.content),
+//                                                    "Something Went Wrong",Snackbar.LENGTH_LONG).show();
+//                                            msgInt = 2;
+//                                            /**
+//                                             * Some Error Occured -- May be total seats <= 0
+//                                             * return 2
+//                                             * */
+//                                            Log.d(TAG,"Some Error Occured -- May be total seats " +
+//                                                    "<= 0");
+//                                            onProgressUpdate(2);
+//                                        }
+//                                    }catch (NullPointerException e)
+//                                        {
+//                                        /**
+//                                         * Error occur due to No Fields Found Corresponding to
+//                                         * variables totalSeats and currentAvailable
+//                                         *
+//                                         * return 2
+//                                         * */
+//                                        Log.d(TAG,"No Fields Found Corresponding to variables " +
+//                                                "totalSeats and currentAvailable: " + e);
+//                                        onProgressUpdate(2);
+//                                    }
+////                                    Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+//                                }
+//                                else {
+//                                    Log.d(TAG, "No such document");
+//                                    Snackbar.make(getActivity().findViewById(android.R.id.content),
+//                                            "Something Went Wrong",Snackbar.LENGTH_LONG).show();
+//                                    msgInt = 2;
+//                                    /**
+//                                     * Some Error Occured -- Document Doesn't Exist --- return 2
+//                                     * */
+//                                    onProgressUpdate(2);
+//
+//                                }
+//                            } else {
+//                                Log.d(TAG, "get failed with ", task.getException());
+//                                Snackbar.make(getActivity().findViewById(android.R.id.content),
+//                                        "Something Went Wrong",Snackbar.LENGTH_LONG).show();
+//                                msgInt = 2;
+//                                /**
+//                                 * Some Error Occured -- Maybe due to Internet Connection -
+//                                 * ---- return 2
+//                                 * */
+//                                onProgressUpdate(2);
+//                            }
+//                        });
 
 
                     }
-                } else {
+                }
+                else {
                     Log.d(TAG, "get failed with ", t.getException());
                     msgInt = 2;
                     /**
@@ -480,6 +571,7 @@ public class EventDetailsFragment extends Fragment {
         @Override
         protected void onProgressUpdate(Integer... values) {
             super.onProgressUpdate(values);
+
             Bundle b = new Bundle();
             b.putInt(FragmentActionListener.REGISTRATION_MSG,values[0]);
             //TODO: change action_value_register to msgInt and make changes accordingly
@@ -488,14 +580,15 @@ public class EventDetailsFragment extends Fragment {
             b.putInt(FragmentActionListener.ACTION_KEY,FragmentActionListener.ACTION_VALUE_REGISTER);
             b.putString("docId",docID);
             fragmentActionListener.actionPerformed(b);
+            progressBarRegister.setVisibility(View.INVISIBLE);
+            register.setVisibility(View.VISIBLE);
             register.setEnabled(true);
             progressBar.setVisibility(View.INVISIBLE);
         }
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            progressBarRegister.setVisibility(View.INVISIBLE);
-            register.setVisibility(View.VISIBLE);
+
 
         }
 
