@@ -2,14 +2,15 @@ package com.dscddu.dscddu.Fragments;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.fragment.app.Fragment;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.dscddu.dscddu.Adapters.EventAdapter;
 import com.dscddu.dscddu.Listeners.FragmentActionListener;
@@ -17,6 +18,7 @@ import com.dscddu.dscddu.Listeners.InternetCheck;
 import com.dscddu.dscddu.Model_Class.EventModel;
 import com.dscddu.dscddu.R;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
@@ -30,6 +32,7 @@ public class HomeFragment extends Fragment {
     private FragmentActionListener fragmentActionListener;
     private EventAdapter adapter;
     private TextView empty;
+    private ExtendedFloatingActionButton efab;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -67,6 +70,9 @@ public class HomeFragment extends Fragment {
         con = getContext();
         linearLayoutManager = new LinearLayoutManager(con);
         recyclerView = rootView.findViewById(R.id.recyclerView);
+        efab = getActivity().findViewById(R.id.homefab);
+        efab.setText("QR Code");
+        efab.setIcon(getActivity().getDrawable(R.drawable.ic_qr_code));
         recyclerView.setLayoutManager(linearLayoutManager);
         rootRef = FirebaseFirestore.getInstance();
         empty = rootView.findViewById(R.id.emptyViewEventsList);
@@ -104,6 +110,12 @@ public class HomeFragment extends Fragment {
             }
         });
         adapter.startListening();
+        efab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getContext(),"QR code clicked",Toast.LENGTH_LONG).show();
+            }
+        });
 
     }
     @Override

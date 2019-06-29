@@ -1,10 +1,8 @@
 package com.dscddu.dscddu.Fragments;
 
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.fragment.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,7 +13,6 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.dscddu.dscddu.Listeners.FragmentActionListener;
 import com.dscddu.dscddu.Listeners.InternetCheck;
-import com.dscddu.dscddu.Model_Class.EventDetailsModel;
 import com.dscddu.dscddu.Model_Class.ProfileModel;
 import com.dscddu.dscddu.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -27,7 +24,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.Hashtable;
 import java.util.Objects;
 
-import static android.support.constraint.Constraints.TAG;
+import static androidx.constraintlayout.widget.Constraints.TAG;
 
 
 public class ProfileFragment extends Fragment {

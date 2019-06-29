@@ -4,10 +4,13 @@ package com.dscddu.dscddu.Fragments;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
+
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.fragment.app.Fragment;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,10 +26,6 @@ import com.dscddu.dscddu.Listeners.FragmentActionListener;
 import com.dscddu.dscddu.Listeners.InternetCheck;
 import com.dscddu.dscddu.Model_Class.EventDetailsModel;
 import com.dscddu.dscddu.R;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -36,36 +35,38 @@ import com.google.firebase.firestore.WriteBatch;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * msgInt == 0 --> Success
  * msgInt == 1 --> Already Registered
  * msgInt == 2 --> some Error
  * msgInt == 3 --> No Seats Available
- * */
+ */
+
 /**
  * registerInt == 0 --> Not Registered
  * registerInt == 1 --> Already Registered
  * registerInt == 2 --> No Seats Available
- * */
+ */
 public class EventDetailsFragment extends Fragment {
     private View rootView;
     private Context con;
     private StringBuilder s;
-//    private Integer registerInt;
+    //    private Integer registerInt;
     private static final String TAG = "EventDetails";
     private TextView desc, time, branch, sem, venue, bring, extra, date;
+    private ConstraintLayout scrollView2;
     private ImageView imageView;
     private Button register;
-    private String docID,eventName;
-    private ProgressBar progressBar,progressBarRegister;
+    private String docID, eventName;
+    private ProgressBar progressBar, progressBarRegister;
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
     Integer registerInt;
     private FirebaseUser user;
     private Integer msgInt = 0;
     private FragmentActionListener fragmentActionListener;
+    private ExtendedFloatingActionButton efab;
 
 
     public EventDetailsFragment() {
@@ -81,7 +82,7 @@ public class EventDetailsFragment extends Fragment {
         return rootView;
     }
 
-    public void setFragmentActionListener(FragmentActionListener fragmentActionListener){
+    public void setFragmentActionListener(FragmentActionListener fragmentActionListener) {
         this.fragmentActionListener = fragmentActionListener;
     }
 
@@ -96,12 +97,16 @@ public class EventDetailsFragment extends Fragment {
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
 
+        efab = getActivity().findViewById(R.id.homefab);
+        efab.setText("Register");
+        efab.setIcon(getActivity().getDrawable(R.drawable.ic_register));
         progressBar = rootView.findViewById(R.id.progressBar);
+        scrollView2 = rootView.findViewById(R.id.cons);
         progressBar.setVisibility(View.VISIBLE);
+        scrollView2.setVisibility(View.INVISIBLE);
         progressBarRegister = rootView.findViewById(R.id.registerProgress);
         progressBarRegister.setVisibility(View.VISIBLE);
         imageView = rootView.findViewById(R.id.eventImage);
-        progressBar.setVisibility(View.INVISIBLE);
         desc = rootView.findViewById(R.id.eventDescription);
         time = rootView.findViewById(R.id.eventTimings);
         date = rootView.findViewById(R.id.eventDate);
@@ -127,14 +132,16 @@ public class EventDetailsFragment extends Fragment {
             date.setText(eventDetails.getDate());
             Glide.with(con).load(eventDetails.getImageUrl()).into(imageView);
             progressBar.setVisibility(View.INVISIBLE);
+            scrollView2.setVisibility(View.VISIBLE);
         });
 
         register.setOnClickListener(v -> {
             progressBar.setVisibility(View.VISIBLE);
+            scrollView2.setVisibility(View.INVISIBLE);
             register.setEnabled(false);
             new InternetCheck(internet -> {
-                if(!internet){
-                    if(fragmentActionListener!=null){
+                if (!internet) {
+                    if (fragmentActionListener != null) {
                         Bundle bun = new Bundle();
                         bun.putInt(FragmentActionListener.ACTION_KEY,
                                 FragmentActionListener.ACTION_NO_INTERNET);
@@ -142,12 +149,19 @@ public class EventDetailsFragment extends Fragment {
                     }
                 }
             });
-            if(fragmentActionListener!=null){
+            if (fragmentActionListener != null) {
                 RegisterTask task1 = new RegisterTask();
                 task1.execute();
 
             }
 
+        });
+        efab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getContext(),"Register clicked",Toast.LENGTH_LONG).show();
+
+            }
         });
 
     }
@@ -161,10 +175,10 @@ public class EventDetailsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(eventName);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(eventName);
         new InternetCheck(internet -> {
-            if(!internet){
-                if(fragmentActionListener!=null){
+            if (!internet) {
+                if (fragmentActionListener != null) {
                     Bundle bundle = new Bundle();
                     bundle.putInt(FragmentActionListener.ACTION_KEY,
                             FragmentActionListener.ACTION_NO_INTERNET);
@@ -174,7 +188,7 @@ public class EventDetailsFragment extends Fragment {
         });
     }
 
-    private void readData(FirestoreCallback firestoreCallback){
+    private void readData(FirestoreCallback firestoreCallback) {
         DocumentReference docRef = db.collection("events").document(docID);
         docRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -183,7 +197,7 @@ public class EventDetailsFragment extends Fragment {
                     try {
                         EventDetailsModel details = new EventDetailsModel();
                         Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                        details.setDescription((String)document.get("description"));
+                        details.setDescription((String) document.get("description"));
                         details.setTimings((String) document.get("timings"));
                         details.setBranch((String) document.get("branch"));
                         details.setSemester((String) document.get("semester"));
@@ -195,53 +209,51 @@ public class EventDetailsFragment extends Fragment {
 
                         firestoreCallback.doCallback(details);
 
-                    }catch (IllegalAccessError e){
+                    } catch (IllegalAccessError e) {
                         Log.d(TAG, "Something is missing in document");
-                        Snackbar.make(getActivity().findViewById(android.R.id.content),"Something Went Wrong",
+                        Snackbar.make(getActivity().findViewById(android.R.id.content), "Something Went Wrong",
                                 Snackbar.LENGTH_LONG).show();
                     }
                 } else {
                     Log.d(TAG, "No such document");
-                    Snackbar.make(getActivity().findViewById(android.R.id.content),"Something Went" +
+                    Snackbar.make(getActivity().findViewById(android.R.id.content), "Something Went" +
                                     " Wrong",
                             Snackbar.LENGTH_LONG).show();
                 }
             } else {
                 Log.d(TAG, "get failed with ", task.getException());
-                Snackbar.make(getActivity().findViewById(android.R.id.content),"Something Went " +
+                Snackbar.make(getActivity().findViewById(android.R.id.content), "Something Went " +
                                 "Wrong",
                         Snackbar.LENGTH_LONG).show();
             }
         });
     }
 
-    private interface FirestoreCallback{
+    private interface FirestoreCallback {
         void doCallback(EventDetailsModel eventDetailsModel);
     }
 
-    public class AlreadyAppliedTask extends AsyncTask<Void,Integer,Void>{
+    public class AlreadyAppliedTask extends AsyncTask<Void, Integer, Void> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
             progressBarRegister.setVisibility(View.VISIBLE);
         }
+
         @Override
         protected Void doInBackground(Void... voids) {
             db.collection("events").document(docID).collection("participants").document(user.getUid())
                     .get().addOnCompleteListener(task1 -> {
                 if (task1.isSuccessful()) {
                     DocumentSnapshot document1 = task1.getResult();
-                    if (document1.exists())
-                    {
+                    if (document1.exists()) {
                         Log.d(TAG, "DocumentSnapshot data: " + document1.getData());
                         /**
                          * Already Applied to Event - return 1
                          * */
                         onProgressUpdate(1);
 
-                    }
-                    else
-                    {
+                    } else {
                         Log.d(TAG, "No such document");
                         /**
                          * NOT YET REGISTERED - return 0 -- but wait check availability
@@ -252,13 +264,13 @@ public class EventDetailsFragment extends Fragment {
                                 DocumentSnapshot document = task.getResult();
                                 if (document.exists()) {
                                     Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                                    Double availableSeats = document.get("currentAvailable",Double.class);
-                                    if(availableSeats <= 0){
+                                    Double availableSeats = document.get("currentAvailable", Double.class);
+                                    if (availableSeats <= 0) {
                                         /**
                                          * NO SEATS AVAILABLE return 2
                                          * */
                                         onProgressUpdate(2);
-                                    }else{
+                                    } else {
                                         /**
                                          *  SEATS AVAILABLE return 0
                                          * */
@@ -269,12 +281,12 @@ public class EventDetailsFragment extends Fragment {
                                 } else {
                                     Log.d(TAG, "No such document");
                                     Snackbar.make(getActivity().findViewById(android.R.id.content),
-                                            "Something Went Wrong",Snackbar.LENGTH_LONG).show();
+                                            "Something Went Wrong", Snackbar.LENGTH_LONG).show();
                                 }
                             } else {
                                 Log.d(TAG, "get failed with ", task.getException());
                                 Snackbar.make(getActivity().findViewById(android.R.id.content),
-                                        "Something Went Wrong",Snackbar.LENGTH_LONG).show();
+                                        "Something Went Wrong", Snackbar.LENGTH_LONG).show();
                             }
                         });
 
@@ -282,42 +294,43 @@ public class EventDetailsFragment extends Fragment {
                 } else {
                     Log.d(TAG, "get failed with ", task1.getException());
                     Snackbar.make(getActivity().findViewById(android.R.id.content),
-                            "Something Went Wrong",Snackbar.LENGTH_LONG).show();
+                            "Something Went Wrong", Snackbar.LENGTH_LONG).show();
                 }
             });
 
 
-
             return null;
         }
+
         /**
          * registerInt == 0 --> Not Registered
          * registerInt == 1 --> Already Registered
          * registerInt == 2 --> No Seats Available
-         * */
+         */
         @Override
         protected void onProgressUpdate(Integer... values) {
             super.onProgressUpdate(values);
-            switch (values[0]){
+            switch (values[0]) {
                 case 0:
                     register.setText(R.string.register_text_for_btn);
                     register.setEnabled(true);
-                    Log.d("buttonhere","register button");
+                    Log.d("buttonhere", "register button");
                     break;
                 case 1:
                     register.setText(R.string.already_registered);
                     register.setEnabled(false);
-                    Log.d("buttonhere","Already Registered");
+                    Log.d("buttonhere", "Already Registered");
                     break;
                 case 2:
                     register.setText(R.string.no_seats);
                     register.setEnabled(false);
-                    Log.d("buttonhere","No seats");
+                    Log.d("buttonhere", "No seats");
                     break;
 
             }
             progressBarRegister.setVisibility(View.INVISIBLE);
         }
+
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
@@ -329,15 +342,17 @@ public class EventDetailsFragment extends Fragment {
         protected void onPreExecute() {
             super.onPreExecute();
             progressBarRegister.setVisibility(View.VISIBLE);
+            scrollView2.setVisibility(View.INVISIBLE);
             register.setVisibility(View.INVISIBLE);
             msgInt = 0;
         }
+
         /**
          * msgInt == 0 --> Success
          * msgInt == 1 --> Already Registered
          * msgInt == 2 --> some Error
          * msgInt == 3 --> No Seats Available
-         * */
+         */
         @Override
         protected Void doInBackground(Void... voids) {
             DocumentReference docRef = db.collection("events").document(docID).collection(
@@ -360,42 +375,39 @@ public class EventDetailsFragment extends Fragment {
                             if (task.isSuccessful()) {
                                 DocumentSnapshot document = task.getResult();
                                 if (document.exists()) {
-                                    try{
-                                        Double totalSeats = document.get("totalSeats",Double.class);
-                                        Double availableSeats = document.get("currentAvailable",Double.class);
-                                        if(availableSeats <= 0)
-                                        {
+                                    try {
+                                        Double totalSeats = document.get("totalSeats", Double.class);
+                                        Double availableSeats = document.get("currentAvailable", Double.class);
+                                        if (availableSeats <= 0) {
                                             /**
                                              * NO SEATS AVAILABLE -- return 3
                                              * */
-                                            msgInt =3;
+                                            msgInt = 3;
                                             onProgressUpdate(3);
-                                        }
-                                        else if(availableSeats > 0 && totalSeats > 0)
-                                        {
+                                        } else if (availableSeats > 0 && totalSeats > 0) {
 
                                             Map<String, Object> data = new HashMap<>();
                                             data.put("attended", false);
 
                                             Map<String, Object> dataUser = new HashMap<>();
                                             dataUser.put("attended", false);
-                                            dataUser.put("eventName",eventName);
+                                            dataUser.put("eventName", eventName);
 
                                             WriteBatch batch = db.batch();
 
                                             // Set the Participants in Particular Document ID
                                             DocumentReference nycRef = db.collection("events").document(docID).collection(
                                                     "participants").document(user.getUid());
-                                            batch.set(nycRef,data);
+                                            batch.set(nycRef, data);
 
                                             // Set Event Name in Users Event Collection
                                             DocumentReference sfRef = db.collection("users").document(user.getUid()).collection(
                                                     "events").document(docID);
-                                            batch.set(sfRef,dataUser);
+                                            batch.set(sfRef, dataUser);
 
                                             //Update The Availability to new Value
                                             DocumentReference Ref = db.collection("events").document(docID);
-                                            batch.update(Ref,"currentAvailable",availableSeats-1);
+                                            batch.update(Ref, "currentAvailable", availableSeats - 1);
                                             // Commit the batch
                                             batch.commit().addOnCompleteListener(task1 -> {
 //                                                Toast.makeText(getContext(),"Batch Complete",Toast.LENGTH_SHORT).show();
@@ -410,38 +422,34 @@ public class EventDetailsFragment extends Fragment {
                                                 onProgressUpdate(2);
                                             });
 
-                                        }
-                                        else
-                                        {
+                                        } else {
                                             Snackbar.make(getActivity().findViewById(android.R.id.content),
-                                                    "Something Went Wrong",Snackbar.LENGTH_LONG).show();
+                                                    "Something Went Wrong", Snackbar.LENGTH_LONG).show();
                                             msgInt = 2;
                                             /**
                                              * Some Error Occured -- May be total seats <= 0
                                              * return 2
                                              * */
-                                            Log.d(TAG,"Some Error Occured -- May be total seats " +
+                                            Log.d(TAG, "Some Error Occured -- May be total seats " +
                                                     "<= 0");
                                             onProgressUpdate(2);
                                         }
-                                    }catch (NullPointerException e)
-                                        {
+                                    } catch (NullPointerException e) {
                                         /**
                                          * Error occur due to No Fields Found Corresponding to
                                          * variables totalSeats and currentAvailable
                                          *
                                          * return 2
                                          * */
-                                        Log.d(TAG,"No Fields Found Corresponding to variables " +
+                                        Log.d(TAG, "No Fields Found Corresponding to variables " +
                                                 "totalSeats and currentAvailable: " + e);
                                         onProgressUpdate(2);
                                     }
 //                                    Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                                }
-                                else {
+                                } else {
                                     Log.d(TAG, "No such document");
                                     Snackbar.make(getActivity().findViewById(android.R.id.content),
-                                            "Something Went Wrong",Snackbar.LENGTH_LONG).show();
+                                            "Something Went Wrong", Snackbar.LENGTH_LONG).show();
                                     msgInt = 2;
                                     /**
                                      * Some Error Occured -- Document Doesn't Exist --- return 2
@@ -452,7 +460,7 @@ public class EventDetailsFragment extends Fragment {
                             } else {
                                 Log.d(TAG, "get failed with ", task.getException());
                                 Snackbar.make(getActivity().findViewById(android.R.id.content),
-                                        "Something Went Wrong",Snackbar.LENGTH_LONG).show();
+                                        "Something Went Wrong", Snackbar.LENGTH_LONG).show();
                                 msgInt = 2;
                                 /**
                                  * Some Error Occured -- Maybe due to Internet Connection -
@@ -481,16 +489,18 @@ public class EventDetailsFragment extends Fragment {
         protected void onProgressUpdate(Integer... values) {
             super.onProgressUpdate(values);
             Bundle b = new Bundle();
-            b.putInt(FragmentActionListener.REGISTRATION_MSG,values[0]);
+            b.putInt(FragmentActionListener.REGISTRATION_MSG, values[0]);
             //TODO: change action_value_register to msgInt and make changes accordingly
             // and display error msg also and remove snakbar afterwards
             // and also check at load of event activity for already applied or not.
-            b.putInt(FragmentActionListener.ACTION_KEY,FragmentActionListener.ACTION_VALUE_REGISTER);
-            b.putString("docId",docID);
+            b.putInt(FragmentActionListener.ACTION_KEY, FragmentActionListener.ACTION_VALUE_REGISTER);
+            b.putString("docId", docID);
             fragmentActionListener.actionPerformed(b);
             register.setEnabled(true);
             progressBar.setVisibility(View.INVISIBLE);
+            scrollView2.setVisibility(View.VISIBLE);
         }
+
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
