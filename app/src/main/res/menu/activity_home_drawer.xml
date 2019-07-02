@@ -16,10 +16,6 @@
             android:id="@+id/nav_events_registered"
             android:icon="@drawable/past_events_history"
             android:title="@string/menu_registered_events" />
-        <item
-            android:id="@+id/nav_qr_code"
-            android:icon="@drawable/ic_qr_code"
-            android:title="@string/your_qr_code" />
 
         <item
             android:id="@+id/nav_suggestion"

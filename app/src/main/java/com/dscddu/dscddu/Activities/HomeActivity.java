@@ -188,15 +188,6 @@ public class HomeActivity extends AppCompatActivity
             dialog.show();
 
         }
-
-        else if(id == R.id.nav_qr_code){
-            getSupportActionBar().setTitle("Your QR Code");
-            fragmentManager.popBackStack("eventDetails", FragmentManager.POP_BACK_STACK_INCLUSIVE);
-            fragmentManager.beginTransaction().replace(R.id.layout_container,
-                    new QrCodeFragment()).commit();
-
-        }
-
         else if(id == R.id.nav_events_registered){
             getSupportActionBar().setTitle(R.string.menu_registered_events);
             fragmentManager.popBackStack("eventDetails", FragmentManager.POP_BACK_STACK_INCLUSIVE);

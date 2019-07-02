@@ -71,8 +71,7 @@ public class HomeFragment extends Fragment {
         linearLayoutManager = new LinearLayoutManager(con);
         recyclerView = rootView.findViewById(R.id.recyclerView);
         efab = getActivity().findViewById(R.id.homefab);
-        efab.setText("QR Code");
-        efab.setIcon(getActivity().getDrawable(R.drawable.ic_qr_code));
+        efab.setVisibility(View.INVISIBLE);
         recyclerView.setLayoutManager(linearLayoutManager);
         rootRef = FirebaseFirestore.getInstance();
         empty = rootView.findViewById(R.id.emptyViewEventsList);

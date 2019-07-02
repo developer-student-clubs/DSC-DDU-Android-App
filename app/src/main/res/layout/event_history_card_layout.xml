@@ -5,12 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="7dp"
-    app:cardCornerRadius="15dp">
+    android:elevation="15dp"
+    app:cardCornerRadius="5dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/backgroundCard">
+        android:background="#FFFFFF">
 
 
         <TextView
@@ -44,16 +45,15 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/history_eventTitle" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/feedbackButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="4dp"
-            android:enabled="false"
-            android:text="Give Feedback"
+            android:text="Feedback"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:textColor="@color/colorPrimaryDark"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/history_eventTitle" />
+            app:layout_constraintTop_toBottomOf="@+id/history_eventTitle"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>
