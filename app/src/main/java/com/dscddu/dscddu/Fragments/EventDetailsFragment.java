@@ -21,8 +21,11 @@ import com.bumptech.glide.Glide;
 import com.dscddu.dscddu.Listeners.FragmentActionListener;
 import com.dscddu.dscddu.Listeners.InternetCheck;
 import com.dscddu.dscddu.Model_Class.EventDetailsModel;
+import com.dscddu.dscddu.Model_Class.ProfileModel;
 import com.dscddu.dscddu.R;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -31,6 +34,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.WriteBatch;
 
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -50,6 +54,7 @@ public class EventDetailsFragment extends Fragment {
     private Context con;
     private StringBuilder s;
 //    private Integer registerInt;
+    private Hashtable<Double,String> branchTable;
     private static final String TAG = "EventDetails";
     private TextView desc, time, branch, sem, venue, bring, extra, date;
     private ImageView imageView;
@@ -59,10 +64,16 @@ public class EventDetailsFragment extends Fragment {
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
     Integer registerInt;
+    private ProfileModel details;
     private FirebaseUser user;
-    private Integer msgInt = 0;
+//    private Integer msgInt = 0;
     private FragmentActionListener fragmentActionListener;
 
+    private static final long twepoch = 1288834974657L;
+    private static final long sequenceBits = 17;
+    private static final long sequenceMax = 65536;
+    private static volatile long lastTimestamp = -1L;
+    private static volatile long sequence = 0L;
 
     public EventDetailsFragment() {
         // Required empty public constructor
@@ -91,6 +102,16 @@ public class EventDetailsFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
+        details = new ProfileModel();
+        //For Branch
+        branchTable = new Hashtable<Double, String>()
+        {{
+            put(1.0,"CE");
+            put( 2.0,"IT");
+            put(3.0,"EC");
+            put( 4.0,"IC");
+            put(5.0,"CH");
+        }};
 
         progressBar = rootView.findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
@@ -332,7 +353,7 @@ public class EventDetailsFragment extends Fragment {
             super.onPreExecute();
             progressBarRegister.setVisibility(View.VISIBLE);
             register.setVisibility(View.INVISIBLE);
-            msgInt = 0;
+
         }
         /**
          * msgInt == 0 --> Success
@@ -350,7 +371,7 @@ public class EventDetailsFragment extends Fragment {
                     DocumentSnapshot doc = t.getResult();
                     if (doc.exists()) {
                         Log.d(TAG, "DocumentSnapshot data: " + doc.getData());
-                        msgInt = 1;
+
                         /**
                          * USER IS ALREADY REGISTERED return 1
                          * */
@@ -360,13 +381,43 @@ public class EventDetailsFragment extends Fragment {
                         /**
                          * Test START
                          * */
+                        DocumentReference userDetailsRef =
+                                db.collection("users").document(user.getUid());
+                            userDetailsRef.get().addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    DocumentSnapshot document = task.getResult();
+                                    if (document.exists()) {
+                                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+
+                                        details.setFirstName((String)document.get("firstName"));
+                                        details.setLastName((String) document.get("lastName"));
+                                        details.setPhoneNumber((String) document.get("phoneNumber"));
+                                        details.setSem((Double) document.get("sem"));
+                                        details.setCollegeId((String) document.get("collegeId"));
+                                        details.setBranch(branchTable.get(document.get("branch")));
+                                    } else {
+                                        Log.d(TAG, "No such document");
+                                        /**
+                                         * SOME ERROR
+                                         * */
+                                        onProgressUpdate(2);
+                                    }
+                                } else {
+                                    Log.d(TAG, "get failed with ", task.getException());
+                                    /**
+                                     * SOME ERROR
+                                     * */
+                                    onProgressUpdate(2);
+
+                                }
+                            });
                         final DocumentReference sfDocRef = db.collection("events").document(docID);
 
                             //TODO: Registration will OPEN SOON OPTION - by making totalSeats == 0
                             db.runTransaction(transaction -> {
                                 DocumentSnapshot snapshot = transaction.get(sfDocRef);
 
-                                Double totalSeats = snapshot.getDouble("totalSeats");
+//                                Double totalSeats = snapshot.getDouble("totalSeats");
                                 Double availableSeats = snapshot.getDouble("currentAvailable");
 
                                 Double varr;
@@ -381,20 +432,32 @@ public class EventDetailsFragment extends Fragment {
                                 }
                                 if (availableSeats > 0) {
 
+
+
                                     //transaction.update(sfDocRef, "population", newPopulation);
                                     Map<String, Object> data = new HashMap<>();
                                     data.put("attended", false);
+                                    data.put("uid",user.getUid());
+                                    data.put("firstName", details.getFirstName());
+                                    data.put("lastName", details.getLastName());
+                                    data.put("sem", details.getSem());
+                                    data.put("branch", details.getBranch());
+                                    data.put("phoneNumber", details.getPhoneNumber());
+                                    data.put("collegeID", details.getCollegeId());
 
+                                    String qrString = user.getEmail() + generateLongId();
 
                                     Map<String, Object> dataUser = new HashMap<>();
                                     dataUser.put("attended", false);
                                     dataUser.put("eventName", eventName);
+                                    dataUser.put("qrCodeString", qrString);
+
 //                                    AtomicBoolean flag = new AtomicBoolean(false);
                                     WriteBatch batch = db.batch();
 
                                     // Set the Participants in Particular Document ID
                                     DocumentReference nycRef = db.collection("events").document(docID).collection(
-                                            "participants").document(user.getUid());
+                                            "participants").document(qrString);
                                     batch.set(nycRef, data);
 
                                     // Set Event Name in Users Event Collection
@@ -557,7 +620,6 @@ public class EventDetailsFragment extends Fragment {
                 }
                 else {
                     Log.d(TAG, "get failed with ", t.getException());
-                    msgInt = 2;
                     /**
                      * Some Error Occured -- return 2
                      * */
@@ -593,6 +655,29 @@ public class EventDetailsFragment extends Fragment {
         }
 
 
+    }
+
+    private static synchronized Long generateLongId() {
+        long timestamp = System.currentTimeMillis();
+        if (lastTimestamp == timestamp) {
+            sequence = (sequence + 1) % sequenceMax;
+            if (sequence == 0) {
+                timestamp = tilNextMillis(lastTimestamp);
+            }
+        } else {
+            sequence = 0;
+        }
+        lastTimestamp = timestamp;
+        Long id = ((timestamp - twepoch) << sequenceBits) | sequence;
+        return id;
+    }
+
+    private static long tilNextMillis(long lastTimestamp) {
+        long timestamp = System.currentTimeMillis();
+        while (timestamp <= lastTimestamp) {
+            timestamp = System.currentTimeMillis();
+        }
+        return timestamp;
     }
 
 }

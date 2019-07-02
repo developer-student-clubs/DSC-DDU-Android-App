@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.dscddu.dscddu.Adapters.EventAdapter;
 import com.dscddu.dscddu.Adapters.EventHistoryAdapter;
@@ -21,6 +22,8 @@ import com.dscddu.dscddu.R;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
@@ -85,6 +88,21 @@ public class EventHistoryFragment extends Fragment {
                 }
             }
         };
+        adapter.setOnItemClickListener(new EventHistoryAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClickQR(DocumentSnapshot documentSnapshot, int position, String qr) {
+                String id = documentSnapshot.getId();
+                DocumentReference path = documentSnapshot.getReference();
+                Toast.makeText(getContext(),qr,Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onItemClickFeed(DocumentSnapshot documentSnapshot, int position) {
+                String id = documentSnapshot.getId();
+                DocumentReference path = documentSnapshot.getReference();
+            }
+        });
+
 //        adapter.setOnItemClickListener((documentSnapshot, position) -> {
 //            EventModel e = documentSnapshot.toObject(EventModel.class);
 //            String eName = e.getEventName();
@@ -103,11 +121,6 @@ public class EventHistoryFragment extends Fragment {
 
     }
 
-//    @Override
-//    public void onResume() {
-//        super.onResume();
-//
-//    }
 
     @Override
     public void onStart() {
