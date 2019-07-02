@@ -6,12 +6,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.dscddu.dscddu.Model_Class.EventHistoryModel;
 import com.dscddu.dscddu.R;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.firebase.firestore.DocumentSnapshot;
 
 public class EventHistoryAdapter extends FirestoreRecyclerAdapter<EventHistoryModel,
         EventHistoryAdapter.EventHistoryHolder> {
@@ -42,6 +44,18 @@ public class EventHistoryAdapter extends FirestoreRecyclerAdapter<EventHistoryMo
             holder.attend.setText("Not Attended");
 
         }
+        holder.qrString.setOnClickListener(v -> {
+            int position1 =holder.getAdapterPosition();
+            if(position1 != RecyclerView.NO_POSITION && listener !=null)
+                listener.onItemClickQR(getSnapshots().getSnapshot(position1), position1,model.getQrString());
+
+        });
+        holder.feedback.setOnClickListener(v -> {
+            int position1 =holder.getAdapterPosition();
+            if(position1 != RecyclerView.NO_POSITION && listener !=null)
+                listener.onItemClickFeed(getSnapshots().getSnapshot(position1), position1);
+        });
+
     }
 
     @NonNull
@@ -53,33 +67,30 @@ public class EventHistoryAdapter extends FirestoreRecyclerAdapter<EventHistoryMo
     }
 
 
+
     public class EventHistoryHolder extends RecyclerView.ViewHolder{
             private View view;
             private TextView eventName,attend;
-//            private Button feedback;
+            private Button feedback,qrString;
 
             public EventHistoryHolder(@NonNull View itemView) {
                 super(itemView);
                 view = itemView;
-//                feedback = itemView.findViewById(R.id.feedbackButton);
                 eventName = itemView.findViewById(R.id.history_eventTitle);
                 attend = itemView.findViewById(R.id.history_attendence);
-//                itemView.setOnClickListener(v -> {
-//                    int position = getAdapterPosition();
-//                    if(position != RecyclerView.NO_POSITION && listener != null)
-//                        listener.onItemClick(getSnapshots().getSnapshot(position),position);
-//                });
-
-
+                feedback = itemView.findViewById(R.id.feedbackButton);
+                qrString = itemView.findViewById(R.id.getQRcode);
             }
         }
 
-//        public interface OnItemClickListener {
-//            void onItemClick(DocumentSnapshot documentSnapshot, int position);
-//        }
-//        public EventAdapter.OnItemClickListener listener;
-//
-//        public void setOnItemClickListener(EventAdapter.OnItemClickListener listener) {
-//                this.listener = listener;
-//        }
+        public interface OnItemClickListener {
+            void onItemClickQR(DocumentSnapshot documentSnapshot, int position, String qr);
+            void onItemClickFeed(DocumentSnapshot documentSnapshot, int position);
+
+        }
+        public OnItemClickListener listener;
+
+        public void setOnItemClickListener(OnItemClickListener listener) {
+                this.listener = listener;
+        }
 }
