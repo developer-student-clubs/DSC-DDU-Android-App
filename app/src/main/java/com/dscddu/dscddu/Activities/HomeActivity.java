@@ -37,7 +37,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class HomeActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, FragmentActionListener{
+        implements NavigationView.OnNavigationItemSelectedListener, FragmentActionListener
+{
     private FirebaseAuth mAuth;
     private FirebaseUser user;
     private FragmentManager fragmentManager;
