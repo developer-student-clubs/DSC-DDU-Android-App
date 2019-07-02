@@ -7,6 +7,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import com.google.android.material.chip.Chip;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import androidx.fragment.app.Fragment;
@@ -57,9 +58,8 @@ public class EventDetailsFragment extends Fragment {
     private TextView desc, time, branch, sem, venue, bring, extra, date;
     private ConstraintLayout scrollView2;
     private ImageView imageView;
-    private Button register;
     private String docID, eventName;
-    private ProgressBar progressBar, progressBarRegister;
+    private ProgressBar progressBar;
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
     Integer registerInt;
@@ -67,6 +67,7 @@ public class EventDetailsFragment extends Fragment {
     private Integer msgInt = 0;
     private FragmentActionListener fragmentActionListener;
     private ExtendedFloatingActionButton efab;
+    private Chip timeChip;
 
 
     public EventDetailsFragment() {
@@ -97,6 +98,7 @@ public class EventDetailsFragment extends Fragment {
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
 
+        timeChip = rootView.findViewById(R.id.timeChip);
         efab = getActivity().findViewById(R.id.homefab);
         efab.setText("Register");
         efab.setIcon(getActivity().getDrawable(R.drawable.ic_register));
@@ -104,8 +106,7 @@ public class EventDetailsFragment extends Fragment {
         scrollView2 = rootView.findViewById(R.id.cons);
         progressBar.setVisibility(View.VISIBLE);
         scrollView2.setVisibility(View.INVISIBLE);
-        progressBarRegister = rootView.findViewById(R.id.registerProgress);
-        progressBarRegister.setVisibility(View.VISIBLE);
+        efab.setVisibility(View.INVISIBLE);
         imageView = rootView.findViewById(R.id.eventImage);
         desc = rootView.findViewById(R.id.eventDescription);
         time = rootView.findViewById(R.id.eventTimings);
@@ -115,15 +116,12 @@ public class EventDetailsFragment extends Fragment {
         venue = rootView.findViewById(R.id.eventVenue);
         bring = rootView.findViewById(R.id.eventBring);
         extra = rootView.findViewById(R.id.eventExtra);
-        register = rootView.findViewById(R.id.registerEvent);
-        register.setText(R.string.check_available);
-        register.setEnabled(false);
         AlreadyAppliedTask task = new AlreadyAppliedTask();
         task.execute();
 
         readData(eventDetails -> {
             desc.setText(eventDetails.getDescription());
-            time.setText(eventDetails.getTimings());
+            timeChip.setText(eventDetails.getTimings());
             branch.setText(eventDetails.getBranch());
             sem.setText(eventDetails.getSemester());
             venue.setText(eventDetails.getVenue());
@@ -133,12 +131,13 @@ public class EventDetailsFragment extends Fragment {
             Glide.with(con).load(eventDetails.getImageUrl()).into(imageView);
             progressBar.setVisibility(View.INVISIBLE);
             scrollView2.setVisibility(View.VISIBLE);
+            efab.setVisibility(View.VISIBLE);
         });
 
-        register.setOnClickListener(v -> {
+        efab.setOnClickListener(v -> {
             progressBar.setVisibility(View.VISIBLE);
             scrollView2.setVisibility(View.INVISIBLE);
-            register.setEnabled(false);
+            efab.setEnabled(false);
             new InternetCheck(internet -> {
                 if (!internet) {
                     if (fragmentActionListener != null) {
@@ -155,13 +154,6 @@ public class EventDetailsFragment extends Fragment {
 
             }
 
-        });
-        efab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(getContext(),"Register clicked",Toast.LENGTH_LONG).show();
-
-            }
         });
 
     }
@@ -237,7 +229,6 @@ public class EventDetailsFragment extends Fragment {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            progressBarRegister.setVisibility(View.VISIBLE);
         }
 
         @Override
@@ -312,23 +303,20 @@ public class EventDetailsFragment extends Fragment {
             super.onProgressUpdate(values);
             switch (values[0]) {
                 case 0:
-                    register.setText(R.string.register_text_for_btn);
-                    register.setEnabled(true);
+                    efab.setText(R.string.register_text_for_btn);
+                    efab.setVisibility(View.VISIBLE);
                     Log.d("buttonhere", "register button");
                     break;
                 case 1:
-                    register.setText(R.string.already_registered);
-                    register.setEnabled(false);
+                    efab.setVisibility(View.INVISIBLE);
                     Log.d("buttonhere", "Already Registered");
                     break;
                 case 2:
-                    register.setText(R.string.no_seats);
-                    register.setEnabled(false);
+                    efab.setVisibility(View.INVISIBLE);
                     Log.d("buttonhere", "No seats");
                     break;
 
             }
-            progressBarRegister.setVisibility(View.INVISIBLE);
         }
 
         @Override
@@ -341,9 +329,8 @@ public class EventDetailsFragment extends Fragment {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            progressBarRegister.setVisibility(View.VISIBLE);
             scrollView2.setVisibility(View.INVISIBLE);
-            register.setVisibility(View.INVISIBLE);
+            efab.setVisibility(View.INVISIBLE);
             msgInt = 0;
         }
 
@@ -496,7 +483,7 @@ public class EventDetailsFragment extends Fragment {
             b.putInt(FragmentActionListener.ACTION_KEY, FragmentActionListener.ACTION_VALUE_REGISTER);
             b.putString("docId", docID);
             fragmentActionListener.actionPerformed(b);
-            register.setEnabled(true);
+            efab.setEnabled(true);
             progressBar.setVisibility(View.INVISIBLE);
             scrollView2.setVisibility(View.VISIBLE);
         }
@@ -504,8 +491,7 @@ public class EventDetailsFragment extends Fragment {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            progressBarRegister.setVisibility(View.INVISIBLE);
-            register.setVisibility(View.VISIBLE);
+            efab.setVisibility(View.VISIBLE);
 
         }
 

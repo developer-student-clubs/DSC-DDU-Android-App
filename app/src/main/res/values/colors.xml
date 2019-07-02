@@ -7,9 +7,15 @@
     <color name="colorPrimary">#2699FB</color>
     <color name="colorPrimaryDark">#3779B2</color>
     <color name="colorAccent">#FBBC04</color>
+    <color name="colorAccentLight">#FFF9C4</color>
     <color name="backgroundWhite">#FFFFFF</color>
     <color name="backgroundBlack">#000000</color>
     <color name="backgroundCard">#79C2F4</color>
+
+    <color name="chip_successfull">#A5D6A7</color>
+    <color name="black">#000000</color>
+    <color name="gray1">#757575</color>
+    <color name="gray">#BDBDBD</color>
 
 
 
