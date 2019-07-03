@@ -47,7 +47,7 @@ public class EventHistoryAdapter extends FirestoreRecyclerAdapter<EventHistoryMo
         holder.qrString.setOnClickListener(v -> {
             int position1 =holder.getAdapterPosition();
             if(position1 != RecyclerView.NO_POSITION && listener !=null)
-                listener.onItemClickQR(getSnapshots().getSnapshot(position1), position1,model.getQrString());
+                listener.onItemClickQR(getSnapshots().getSnapshot(position1), position1,model.getQrCodeString());
 
         });
         holder.feedback.setOnClickListener(v -> {
