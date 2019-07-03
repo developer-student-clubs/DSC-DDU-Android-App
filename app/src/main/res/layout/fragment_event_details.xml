@@ -67,15 +67,19 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/eventDescription" />
+
             <TextView
-                android:id="@+id/textView5"
+                android:id="@+id/eventNameTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="14dp"
+                android:layout_marginEnd="16dp"
                 android:text="Event name"
                 android:textColor="@color/black"
                 android:textSize="35dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/eventImage" />
 
@@ -172,7 +176,7 @@
                 android:textColor="@color/backgroundBlack"
                 android:textSize="14sp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView5" />
+                app:layout_constraintTop_toBottomOf="@+id/eventNameTitle" />
 
             <TextView
                 android:id="@+id/eventTimings"

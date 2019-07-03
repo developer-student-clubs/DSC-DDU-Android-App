@@ -69,7 +69,7 @@ public class OnBoardingActivity extends AppCompatActivity {
                 " receiving regular notifications.",
                 R.drawable.notification));
         mList.add(new LayoutScreenForOnBoarding("e-Certificates for Events","Easily Download " +
-                "e-Certificates for the events participated",R.drawable.medal));
+                "e-Certificates for the events participated (Coming Soon)",R.drawable.medal));
 
         // setup viewpager
         adapter = new IntroViewPagerAdapter(this,mList);

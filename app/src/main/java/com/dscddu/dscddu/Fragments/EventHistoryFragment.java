@@ -49,9 +49,6 @@ public class EventHistoryFragment extends Fragment {
     private FirebaseAuth mAuth;
     private FirebaseUser user;
 
-    public void setFragmentActionListener(FragmentActionListener fragmentActionListener){
-        this.fragmentActionListener = fragmentActionListener;
-    }
     public EventHistoryFragment() {
         // Required empty public constructor
     }
@@ -116,7 +113,7 @@ public class EventHistoryFragment extends Fragment {
                     e.printStackTrace();
                 }
                 alertDialog.setView(view);
-                alertDialog.setTitle("OR Code");
+                alertDialog.setTitle("QR Code");
                 alertDialog.setPositiveButton("Done", (dialog, which) -> dialog.cancel());
                 AlertDialog dialog = alertDialog.create();
                 dialog.show();
