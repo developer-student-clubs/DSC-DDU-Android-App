@@ -441,6 +441,8 @@ public class EventDetailsFragment extends Fragment {
 
 
                                     //transaction.update(sfDocRef, "population", newPopulation);
+                                    String qrString = user.getEmail() + generateLongId();
+
                                     Map<String, Object> data = new HashMap<>();
                                     data.put("attended", false);
                                     data.put("uid",user.getUid());
@@ -450,8 +452,8 @@ public class EventDetailsFragment extends Fragment {
                                     data.put("branch", details.getBranch());
                                     data.put("phoneNumber", details.getPhoneNumber());
                                     data.put("collegeID", details.getCollegeId());
+                                    data.put("qrCodeString", qrString);
 
-                                    String qrString = user.getEmail() + generateLongId();
 
                                     Map<String, Object> dataUser = new HashMap<>();
                                     dataUser.put("attended", false);

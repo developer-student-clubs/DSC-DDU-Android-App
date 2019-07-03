@@ -2,13 +2,18 @@ package com.dscddu.dscddu.Fragments;
 
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,6 +28,11 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.journeyapps.barcodescanner.BarcodeEncoder;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -90,7 +100,27 @@ public class EventHistoryFragment extends Fragment {
             public void onItemClickQR(DocumentSnapshot documentSnapshot, int position, String qr) {
                 String id = documentSnapshot.getId();
                 DocumentReference path = documentSnapshot.getReference();
-                Toast.makeText(getContext(),qr,Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getContext(),qr,Toast.LENGTH_SHORT).show();
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(getContext());
+                LayoutInflater factory = LayoutInflater.from(getContext());
+                final View view = factory.inflate(R.layout.barcode_image, null);
+                ImageView imageView=view.findViewById(R.id.dialog_imageview);
+                String text=qr;
+                MultiFormatWriter multiFormatWriter = new MultiFormatWriter();
+                try {
+                    BitMatrix bitMatrix = multiFormatWriter.encode(text, BarcodeFormat.QR_CODE,1000,1000);
+                    BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
+                    Bitmap bitmap = barcodeEncoder.createBitmap(bitMatrix);
+                    imageView.setImageBitmap(bitmap);
+                } catch (WriterException e) {
+                    e.printStackTrace();
+                }
+                alertDialog.setView(view);
+                alertDialog.setTitle("OR Code");
+                alertDialog.setPositiveButton("Done", (dialog, which) -> dialog.cancel());
+                AlertDialog dialog = alertDialog.create();
+                dialog.show();
+
             }
 
             @Override
