@@ -2,12 +2,15 @@ package com.dscddu.dscddu.Fragments;
 
 import android.os.Bundle;
 import com.google.android.material.snackbar.Snackbar;
+
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -32,9 +35,11 @@ public class ProfileFragment extends Fragment {
     private View rootView;
     private TextView name,email,branch,collegeid,lname,fname,phone,sem;
     private ImageView imageView;
+    private ProgressBar pg;
     private FirebaseFirestore db;
     private FirebaseUser user;
     private FirebaseAuth mAuth;
+    private ConstraintLayout profileLayout;
     private FragmentActionListener fragmentActionListener;
     private Hashtable<Double,String> branchTable;
     public ProfileFragment() {
@@ -72,6 +77,10 @@ public class ProfileFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
+        profileLayout = rootView.findViewById(R.id.profileConstraintLayout);
+        pg = rootView.findViewById(R.id.profileProgress);
+        pg.setVisibility(View.VISIBLE);
+
         name = rootView.findViewById(R.id.profile_name);
         imageView = rootView.findViewById(R.id.profile_photo);
         collegeid = rootView.findViewById(R.id.profile_collegeid);
@@ -98,11 +107,15 @@ public class ProfileFragment extends Fragment {
             lname.setText(profileModel.getLastName());
             phone.setText(profileModel.getPhoneNumber());
             sem.setText(String.valueOf( profileModel.getSem().intValue()));
+            profileLayout.setVisibility(View.VISIBLE);
+            pg.setVisibility(View.INVISIBLE);
         });
 
     }
 
     private void readData(FirestoreCallback firestoreCallback){
+        profileLayout.setVisibility(View.INVISIBLE);
+        pg.setVisibility(View.VISIBLE);
         DocumentReference docRef = db.collection("users").document(user.getUid());
         docRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {

@@ -61,7 +61,7 @@ public class EventDetailsFragment extends Fragment {
 //    private Integer registerInt;
     private Hashtable<Double,String> branchTable;
     private static final String TAG = "EventDetails";
-    private TextView desc, time, branch, sem, venue, bring, extra, date;
+    private TextView desc, time, branch,eName, sem, venue, bring, extra, date;
     private ConstraintLayout scrollView2;
     private ImageView imageView;
     private String docID, eventName;
@@ -104,6 +104,7 @@ public class EventDetailsFragment extends Fragment {
         registerInt = 0;
         Bundle bundle = getArguments();
         assert bundle != null;
+        eName = rootView.findViewById(R.id.eventNameTitle);
         docID = bundle.getString("docId");
         eventName = bundle.getString("eName");
         db = FirebaseFirestore.getInstance();
@@ -142,6 +143,7 @@ public class EventDetailsFragment extends Fragment {
         task.execute();
 
         readData(eventDetails -> {
+            eName.setText(eventDetails.getEventName());
             desc.setText(eventDetails.getDescription());
             timeChip.setText(eventDetails.getTimings());
             branch.setText(eventDetails.getBranch());
@@ -211,6 +213,7 @@ public class EventDetailsFragment extends Fragment {
                     try {
                         EventDetailsModel details = new EventDetailsModel();
                         Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                        details.setEventName((String) document.get("eventName"));
                         details.setDescription((String) document.get("description"));
                         details.setTimings((String) document.get("timings"));
                         details.setBranch((String) document.get("branch"));
@@ -465,7 +468,7 @@ public class EventDetailsFragment extends Fragment {
 
                                     // Set the Participants in Particular Document ID
                                     DocumentReference nycRef = db.collection("events").document(docID).collection(
-                                            "participants").document(qrString);
+                                            "participants").document(user.getUid());
                                     batch.set(nycRef, data);
 
                                     // Set Event Name in Users Event Collection
