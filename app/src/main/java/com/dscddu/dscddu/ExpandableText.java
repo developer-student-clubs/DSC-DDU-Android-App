@@ -6,10 +6,6 @@ import android.text.SpannableStringBuilder;
 import android.util.AttributeSet;
 import android.view.View;
 
-/**
- * User: Bazlur Rahman Rokon
- * Date: 9/7/13 - 3:33 AM
- */
 public class ExpandableText extends androidx.appcompat.widget.AppCompatTextView {
     private static final int DEFAULT_TRIM_LENGTH = 150;
     private static final String ELLIPSIS = ".....";

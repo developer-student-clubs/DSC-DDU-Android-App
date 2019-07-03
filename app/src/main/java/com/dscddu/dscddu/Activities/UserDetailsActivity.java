@@ -6,14 +6,18 @@ import android.content.SharedPreferences;
 import androidx.annotation.NonNull;
 import com.google.android.material.snackbar.Snackbar;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dscddu.dscddu.Listeners.InternetCheck;
@@ -37,7 +41,9 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
     private EditText fname,lname,phone,collegeID;
     private FirebaseAuth mAuth;
     private FirebaseUser user;
+    private TextView privacyPolicy;
     private Spinner sem,branch;
+    private CheckBox checkStudent, checkTerms;
     private FirebaseFirestore db;
     private Hashtable<String,Double> branchTable;
     private Hashtable<String,Double> semTable;
@@ -82,9 +88,14 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
         db = FirebaseFirestore.getInstance();
         user = mAuth.getCurrentUser();
         fname = findViewById(R.id.register_fname);
+        privacyPolicy = findViewById(R.id.privacyPolicy);
+        privacyPolicy.setOnClickListener(this);
         lname = findViewById(R.id.register_lname);
         phone = findViewById(R.id.register_phone);
         collegeID = findViewById(R.id.register_collegeid);
+        checkStudent = findViewById(R.id.checkStudent);
+        checkTerms = findViewById(R.id.checkPrivacy);
+
 
         submit = findViewById(R.id.submit_register);
         submit.setOnClickListener(this);
@@ -115,6 +126,10 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
     @Override
     public void onClick(View v) {
         switch (v.getId()){
+            case R.id.privacyPolicy:
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://docs.google.com/document/d/1fEeUyUYV6U1ehHtcJV98xbGNlZthAbBLZoOz5eLBDiY/edit"));
+                startActivity(browserIntent);
+                break;
             case R.id.submit_register:
                 String MobilePattern = "[0-9]{10}";
 
@@ -150,6 +165,17 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
                 }
                 if (sem.getSelectedItem().toString().trim().equals("Select Sem")) {
                     Toast.makeText(this, "Please Select Semester", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if(!checkStudent.isChecked()){
+                    Snackbar.make(findViewById(android.R.id.content),"Please Confirm that you are" +
+                            " DDU Student",Snackbar.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if(!checkTerms.isChecked()){
+                    Snackbar.make(findViewById(android.R.id.content),"Please accept Terms and " +
+                            "Conditions",Snackbar.LENGTH_SHORT).show();
                     return;
                 }
                 Double branchNum = branchTable.get(branch.getSelectedItem().toString().trim());
