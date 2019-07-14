@@ -73,6 +73,11 @@ public class ProfileFragment extends Fragment {
             put(3.0,"EC");
             put( 4.0,"IC");
             put(5.0,"CH");
+            put(6.0,"MH");
+            put(7.0,"CL");
+            put(8.0,"BCA");
+
+
         }};
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
