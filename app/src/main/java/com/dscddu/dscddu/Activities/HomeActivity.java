@@ -164,7 +164,8 @@ public class HomeActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_help) {
-            Toast.makeText(this,"HELP CLICKED",Toast.LENGTH_SHORT).show();
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.dscddu.com/"));
+            startActivity(browserIntent);
             return true;
         }
 

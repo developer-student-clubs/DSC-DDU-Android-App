@@ -16,6 +16,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,7 +33,8 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 
-public class UserDetailsActivity extends AppCompatActivity implements View.OnClickListener {
+public class UserDetailsActivity extends AppCompatActivity
+        implements View.OnClickListener {
     private static final String TAG = "UserActivity";
     public static final Integer STUDENT = 1;
     public static final Integer ORGANIZER = 2;
@@ -41,9 +43,10 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
     private EditText fname,lname,phone,collegeID;
     private FirebaseAuth mAuth;
     private FirebaseUser user;
+//    private ProgressBar pg;
     private TextView privacyPolicy;
     private Spinner sem,branch;
-    private CheckBox checkStudent, checkTerms;
+    private CheckBox  checkTerms;
     private FirebaseFirestore db;
     private Hashtable<String,Double> branchTable;
     private Hashtable<String,Double> semTable;
@@ -56,11 +59,12 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
         setContentView(R.layout.activity_user_details);
         sharedPreferences= getSharedPreferences("data", Context.MODE_PRIVATE);
         sem = findViewById(R.id.spinner_sem);
+//        pg = findViewById(R.id.confirmProgress);
+//        pg.setVisibility(View.GONE);
         branch = findViewById(R.id.spinner_branch);
-        String[] branchName = { "Select Branch","CE", "IT", "EC", "IC", "CH"};
+        String[] branchName = { "Select Branch","CE", "IT", "EC", "IC", "CH","MH","CL","BCA"};
         String[] sems = {"Select Sem","1", "2", "3", "4", "5","6","7","8"};
-        ArrayAdapter adapterBranch = new ArrayAdapter(this,
-                android.R.layout.simple_list_item_1 ,branchName);
+        ArrayAdapter adapterBranch = new ArrayAdapter(this, android.R.layout.simple_list_item_1 ,branchName);
         branch.setAdapter(adapterBranch);
         branchTable = new Hashtable<String, Double>()
         {{
@@ -69,6 +73,10 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
             put("EC",3.0);
             put("IC", 4.0);
             put("CH", 5.0);
+            put("MH", 6.0);
+            put("CL", 7.0);
+            put("BCA", 8.0);
+
         }};
         semTable = new Hashtable<String, Double>()
         {{
@@ -93,8 +101,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
         lname = findViewById(R.id.register_lname);
         phone = findViewById(R.id.register_phone);
         collegeID = findViewById(R.id.register_collegeid);
-        checkStudent = findViewById(R.id.checkStudent);
-        checkTerms = findViewById(R.id.checkPrivacy);
+        checkTerms = findViewById(R.id.privacyPolicyCheck);
 
 
         submit = findViewById(R.id.submit_register);
@@ -131,51 +138,55 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
                 startActivity(browserIntent);
                 break;
             case R.id.submit_register:
+//                pg.setVisibility(View.VISIBLE);
                 String MobilePattern = "[0-9]{10}";
 
                 if (fname.getText().toString().isEmpty()) {
                     fname.setError("First Name Required");
                     requestFocus(fname);
+//                    pg.setVisibility(View.INVISIBLE);
                     return;
                 }
                 if (lname.getText().toString().isEmpty()) {
                     lname.setError("Last Name Required");
                     requestFocus(lname);
+//                    pg.setVisibility(View.INVISIBLE);
                     return;
                 }
                 if (phone.getText().toString().isEmpty()) {
                     phone.setError("Phone Number Required");
                     requestFocus(phone);
+//                    pg.setVisibility(View.INVISIBLE);
                     return;
                 }
 
                 if (!phone.getText().toString().matches(MobilePattern)) {
                     phone.setError("Please enter valid 10 digit phone number");
                     requestFocus(phone);
+//                    pg.setVisibility(View.INVISIBLE);
                     return;
                 }
                 if(collegeID.getText().toString().isEmpty()) {
                     collegeID.setError("College ID Required");
                     requestFocus(collegeID);
+//                    pg.setVisibility(View.INVISIBLE);
                     return;
                 }
                 if (branch.getSelectedItem().toString().trim().equals("Select Branch")) {
                     Toast.makeText(this, "Please Select Branch", Toast.LENGTH_SHORT).show();
+//                    pg.setVisibility(View.INVISIBLE);
                     return;
                 }
                 if (sem.getSelectedItem().toString().trim().equals("Select Sem")) {
                     Toast.makeText(this, "Please Select Semester", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                if(!checkStudent.isChecked()){
-                    Snackbar.make(findViewById(android.R.id.content),"Please Confirm that you are" +
-                            " DDU Student",Snackbar.LENGTH_SHORT).show();
+//                    pg.setVisibility(View.INVISIBLE);
                     return;
                 }
 
                 if(!checkTerms.isChecked()){
                     Snackbar.make(findViewById(android.R.id.content),"Please accept Terms and " +
                             "Conditions",Snackbar.LENGTH_SHORT).show();
+//                    pg.setVisibility(View.INVISIBLE);
                     return;
                 }
                 Double branchNum = branchTable.get(branch.getSelectedItem().toString().trim());
@@ -199,6 +210,7 @@ public class UserDetailsActivity extends AppCompatActivity implements View.OnCli
                                 SharedPreferences.Editor editor = sharedPreferences.edit();
                                 editor.putBoolean("pageVisited",true);
                                 editor.apply();
+//                                pg.setVisibility(View.INVISIBLE);
                                 Intent home = new Intent(getApplicationContext(),HomeActivity.class);
                                 startActivity(home);
                                 finish();

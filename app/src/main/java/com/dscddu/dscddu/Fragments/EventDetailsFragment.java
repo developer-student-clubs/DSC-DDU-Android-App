@@ -115,10 +115,13 @@ public class EventDetailsFragment extends Fragment {
         branchTable = new Hashtable<Double, String>()
         {{
             put(1.0,"CE");
-            put( 2.0,"IT");
+            put(2.0,"IT");
             put(3.0,"EC");
-            put( 4.0,"IC");
+            put(4.0,"IC");
             put(5.0,"CH");
+            put(6.0,"MH");
+            put(7.0,"CL");
+            put(8.0,"BCA");
         }};
 
         timeChip = rootView.findViewById(R.id.timeChip);
@@ -258,7 +261,8 @@ public class EventDetailsFragment extends Fragment {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            db.collection("events").document(docID).collection("participants").document(user.getUid())
+            db.collection("events").document(docID).collection("participants")
+                    .document(user.getUid())
                     .get().addOnCompleteListener(task1 -> {
                 if (task1.isSuccessful()) {
                     DocumentSnapshot document1 = task1.getResult();
@@ -403,7 +407,7 @@ public class EventDetailsFragment extends Fragment {
                                         details.setPhoneNumber((String) document.get("phoneNumber"));
                                         details.setSem((Double) document.get("sem"));
                                         details.setCollegeId((String) document.get("collegeId"));
-                                        details.setBranch(branchTable.get(document.get("branch")));
+                                        details.setBranch(branchTable.get((Double) document.get("branch")));
                                     } else {
                                         Log.d(TAG, "No such document");
                                         /**
@@ -486,8 +490,7 @@ public class EventDetailsFragment extends Fragment {
 //                                    //Update The Availability to new Value through transaction
 //                                    DocumentReference Ref = db.collection("events").document(docID);
 //                                    batch.update(Ref, "currentAvailable", availableSeats - 1);
-                                    transaction.update(sfDocRef, "currentAvailable",
-                                            availableSeats - 1);
+                                    transaction.update(sfDocRef, "currentAvailable", availableSeats - 1);
 
                                     return 0.0;
                                 }
