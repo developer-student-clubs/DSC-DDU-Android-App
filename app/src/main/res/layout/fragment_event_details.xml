@@ -70,7 +70,7 @@
 
             <TextView
                 android:id="@+id/eventNameTitle"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="14dp"
@@ -193,15 +193,15 @@
 
             <TextView
                 android:id="@+id/eventBranch"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
                 android:fontFamily="@font/open_sans"
+                android:text="Branch"
                 android:textColor="@color/backgroundBlack"
                 android:textSize="18sp"
-                android:text="Branch"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toEndOf="@+id/textView8"
@@ -225,15 +225,15 @@
 
             <TextView
                 android:id="@+id/eventBring"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
                 android:fontFamily="@font/open_sans"
+                android:text="What to bring"
                 android:textColor="@color/backgroundBlack"
                 android:textSize="18sp"
-                android:text="What to bring"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toEndOf="@+id/textView9"
@@ -241,15 +241,15 @@
 
             <TextView
                 android:id="@+id/eventSem"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
                 android:fontFamily="@font/open_sans"
+                android:text="Semester"
                 android:textColor="@color/backgroundBlack"
                 android:textSize="18sp"
-                android:text="Semester"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toEndOf="@+id/textView10"
@@ -257,7 +257,7 @@
 
             <TextView
                 android:id="@+id/eventVenue"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"

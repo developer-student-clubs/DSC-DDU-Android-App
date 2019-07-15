@@ -71,7 +71,8 @@ public class EventHistoryFragment extends Fragment {
         recyclerView.setLayoutManager(linearLayoutManager);
         emptyView = rootView.findViewById(R.id.emptyViewHistory);
         rootRef = FirebaseFirestore.getInstance();
-        Query query = rootRef.collection("users").document(user.getUid()).collection("events");
+        Query query = rootRef.collection("users")
+                .document(user.getUid()).collection("events");
 //                .orderBy("postedOn", Query.Direction.DESCENDING);
         FirestoreRecyclerOptions<EventHistoryModel> options =
                 new FirestoreRecyclerOptions.Builder<EventHistoryModel>()
