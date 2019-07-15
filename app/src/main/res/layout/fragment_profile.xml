@@ -36,12 +36,13 @@
 
             <TextView
                 android:id="@+id/profile_name"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
                 android:fontFamily="@font/open_sans"
+                android:gravity="center"
                 android:textColor="@color/backgroundBlack"
                 android:textSize="20sp"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -50,12 +51,13 @@
 
             <TextView
                 android:id="@+id/profile_email"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
                 android:fontFamily="@font/open_sans"
+                android:gravity="center"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/profile_name" />
@@ -74,7 +76,7 @@
 
             <TextView
                 android:id="@+id/profile_lname"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
@@ -89,7 +91,7 @@
 
             <TextView
                 android:id="@+id/profile_branch"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
@@ -104,7 +106,7 @@
 
             <TextView
                 android:id="@+id/profile_sem"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
@@ -119,7 +121,7 @@
 
             <TextView
                 android:id="@+id/profile_phone"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
@@ -134,7 +136,7 @@
 
             <TextView
                 android:id="@+id/profile_collegeid"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
@@ -149,7 +151,7 @@
 
             <TextView
                 android:id="@+id/profile_fname"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="16dp"
