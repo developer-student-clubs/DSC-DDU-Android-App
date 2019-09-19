@@ -58,9 +58,9 @@ public class EventDetailsFragment extends Fragment {
     private View rootView;
     private Context con;
     private StringBuilder s;
-//    private Integer registerInt;
+    private ProfileModel profileDetails;
     private Hashtable<Double,String> branchTable;
-    private static final String TAG = "EventDetails";
+    private static final String TAG = "EventDetailsFragment";
     private TextView desc, time, branch,eName, sem, venue, bring, extra, date;
     private ConstraintLayout scrollView2;
     private ImageView imageView;
@@ -69,7 +69,6 @@ public class EventDetailsFragment extends Fragment {
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
     Integer registerInt;
-    private ProfileModel details;
     private FirebaseUser user;
 //    private Integer msgInt = 0;
     private FragmentActionListener fragmentActionListener;
@@ -102,6 +101,7 @@ public class EventDetailsFragment extends Fragment {
     private void initUI() {
         con = getContext();
         registerInt = 0;
+        profileDetails = new ProfileModel();
         Bundle bundle = getArguments();
         assert bundle != null;
         eName = rootView.findViewById(R.id.eventNameTitle);
@@ -110,7 +110,6 @@ public class EventDetailsFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
-        details = new ProfileModel();
         //For Branch
         branchTable = new Hashtable<Double, String>()
         {{
@@ -176,6 +175,8 @@ public class EventDetailsFragment extends Fragment {
                 }
             });
             if (fragmentActionListener != null) {
+                getUserData t1 = new getUserData();
+                t1.execute();
                 RegisterTask task1 = new RegisterTask();
                 task1.execute();
 
@@ -253,6 +254,52 @@ public class EventDetailsFragment extends Fragment {
         void doCallback(EventDetailsModel eventDetailsModel);
     }
 
+    public class getUserData extends AsyncTask<Void,ProfileModel,Void>{
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            DocumentReference userDetailsRef =
+                    db.collection("users").document(user.getUid());
+            userDetailsRef.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                        ProfileModel details = new ProfileModel();
+                        details.setFirstName((String)document.get("firstName"));
+                        details.setLastName((String) document.get("lastName"));
+                        details.setPhoneNumber((String) document.get("phoneNumber"));
+                        details.setSem((Double) document.get("sem"));
+                        details.setCollegeId((String) document.get("collegeId"));
+                        details.setBranch(branchTable.get((Double) document.get("branch")));
+                        onProgressUpdate(details);
+                    } else {
+                        Log.d(TAG, "No such document");
+                        /**
+                         * SOME ERROR
+                         * */
+                        onProgressUpdate(null);
+                    }
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                    /**
+                     * SOME ERROR
+                     * */
+                    onProgressUpdate(null);
+
+                }
+            });
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(ProfileModel... values) {
+            super.onProgressUpdate(values);
+            profileDetails = values[0];
+
+        }
+    }
+
     public class AlreadyAppliedTask extends AsyncTask<Void, Integer, Void> {
         @Override
         protected void onPreExecute() {
@@ -261,7 +308,8 @@ public class EventDetailsFragment extends Fragment {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            db.collection("events").document(docID).collection("participants")
+            db.collection("events").document(docID).
+                    collection("participants")
                     .document(user.getUid())
                     .get().addOnCompleteListener(task1 -> {
                 if (task1.isSuccessful()) {
@@ -394,36 +442,7 @@ public class EventDetailsFragment extends Fragment {
                         /**
                          * Test START
                          * */
-                        DocumentReference userDetailsRef =
-                                db.collection("users").document(user.getUid());
-                            userDetailsRef.get().addOnCompleteListener(task -> {
-                                if (task.isSuccessful()) {
-                                    DocumentSnapshot document = task.getResult();
-                                    if (document.exists()) {
-                                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
 
-                                        details.setFirstName((String)document.get("firstName"));
-                                        details.setLastName((String) document.get("lastName"));
-                                        details.setPhoneNumber((String) document.get("phoneNumber"));
-                                        details.setSem((Double) document.get("sem"));
-                                        details.setCollegeId((String) document.get("collegeId"));
-                                        details.setBranch(branchTable.get((Double) document.get("branch")));
-                                    } else {
-                                        Log.d(TAG, "No such document");
-                                        /**
-                                         * SOME ERROR
-                                         * */
-                                        onProgressUpdate(2);
-                                    }
-                                } else {
-                                    Log.d(TAG, "get failed with ", task.getException());
-                                    /**
-                                     * SOME ERROR
-                                     * */
-                                    onProgressUpdate(2);
-
-                                }
-                            });
                         final DocumentReference sfDocRef = db.collection("events").document(docID);
 
                             //TODO: Registration will OPEN SOON OPTION - by making totalSeats == 0
@@ -446,19 +465,18 @@ public class EventDetailsFragment extends Fragment {
                                 if (availableSeats > 0) {
 
 
-
                                     //transaction.update(sfDocRef, "population", newPopulation);
                                     String qrString = user.getEmail() + generateLongId();
 
                                     Map<String, Object> data = new HashMap<>();
                                     data.put("attended", false);
                                     data.put("uid",user.getUid());
-                                    data.put("firstName", details.getFirstName());
-                                    data.put("lastName", details.getLastName());
-                                    data.put("sem", details.getSem());
-                                    data.put("branch", details.getBranch());
-                                    data.put("phoneNumber", details.getPhoneNumber());
-                                    data.put("collegeID", details.getCollegeId());
+                                    data.put("firstName", profileDetails.getFirstName());
+                                    data.put("lastName", profileDetails.getLastName());
+                                    data.put("sem", profileDetails.getSem());
+                                    data.put("branch", profileDetails.getBranch());
+                                    data.put("phoneNumber", profileDetails.getPhoneNumber());
+                                    data.put("collegeID", profileDetails.getCollegeId());
                                     data.put("qrCodeString", qrString);
 
 
